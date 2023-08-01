@@ -1,0 +1,35 @@
+.fhfRjL {
+    position: relative;
+    width: 100%;
+    margin: 0px auto;
+}
+
+.cbrQzt > div {
+    outline: none;
+}
+
+.ProseMirror {
+    overflow: visible;
+    padding-top: 36px;
+}
+
+.note-common-styles__textnote-body {
+    overflow: hidden;
+    font-family: Hiragino Mincho ProN,Hiragino Mincho Pro,HGSMinchoE,Yu Mincho,YuMincho,MS PMincho,serif;
+    color: var(--color-text-primary);
+    pointer-events: auto;
+}
+/*
+.note-common-styles__textnote-body h2 {
+    margin-top: 54px;
+    font-size: var(--font-size-2xl);
+}
+*/
+.note-common-styles__textnote-body p, .note-common-styles__textnote-body ul li {
+    font-size: var(--font-size-lg);
+    line-height: 2.25rem;
+}
+
+
+
+

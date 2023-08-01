@@ -6,13 +6,7 @@
 
 /* eslint-disable */
 import * as React from "react";
-import {
-  Button,
-  Flex,
-  Grid,
-  SwitchField,
-  TextField,
-} from "@aws-amplify/ui-react";
+import { Button, Flex, Grid, TextField } from "@aws-amplify/ui-react";
 import { getOverrideProps } from "@aws-amplify/ui-react/internal";
 import { Post } from "../models";
 import { fetchByPath, validateField } from "./utils";
@@ -32,13 +26,11 @@ export default function PostUpdateForm(props) {
   const initialValues = {
     title: "",
     content: "",
-    publish_status: false,
+    author: "",
   };
   const [title, setTitle] = React.useState(initialValues.title);
   const [content, setContent] = React.useState(initialValues.content);
-  const [publish_status, setPublish_status] = React.useState(
-    initialValues.publish_status
-  );
+  const [author, setAuthor] = React.useState(initialValues.author);
   const [errors, setErrors] = React.useState({});
   const resetStateValues = () => {
     const cleanValues = postRecord
@@ -46,7 +38,7 @@ export default function PostUpdateForm(props) {
       : initialValues;
     setTitle(cleanValues.title);
     setContent(cleanValues.content);
-    setPublish_status(cleanValues.publish_status);
+    setAuthor(cleanValues.author);
     setErrors({});
   };
   const [postRecord, setPostRecord] = React.useState(post);
@@ -61,7 +53,7 @@ export default function PostUpdateForm(props) {
   const validations = {
     title: [],
     content: [],
-    publish_status: [],
+    author: [],
   };
   const runValidationTasks = async (
     fieldName,
@@ -90,7 +82,7 @@ export default function PostUpdateForm(props) {
         let modelFields = {
           title,
           content,
-          publish_status,
+          author,
         };
         const validationResponses = await Promise.all(
           Object.keys(validations).reduce((promises, fieldName) => {
@@ -148,7 +140,7 @@ export default function PostUpdateForm(props) {
             const modelFields = {
               title: value,
               content,
-              publish_status,
+              author,
             };
             const result = onChange(modelFields);
             value = result?.title ?? value;
@@ -174,7 +166,7 @@ export default function PostUpdateForm(props) {
             const modelFields = {
               title,
               content: value,
-              publish_status,
+              author,
             };
             const result = onChange(modelFields);
             value = result?.content ?? value;
@@ -189,32 +181,32 @@ export default function PostUpdateForm(props) {
         hasError={errors.content?.hasError}
         {...getOverrideProps(overrides, "content")}
       ></TextField>
-      <SwitchField
-        label="Publish status"
-        defaultChecked={false}
-        isDisabled={false}
-        isChecked={publish_status}
+      <TextField
+        label="Author"
+        isRequired={false}
+        isReadOnly={false}
+        value={author}
         onChange={(e) => {
-          let value = e.target.checked;
+          let { value } = e.target;
           if (onChange) {
             const modelFields = {
               title,
               content,
-              publish_status: value,
+              author: value,
             };
             const result = onChange(modelFields);
-            value = result?.publish_status ?? value;
+            value = result?.author ?? value;
           }
-          if (errors.publish_status?.hasError) {
-            runValidationTasks("publish_status", value);
+          if (errors.author?.hasError) {
+            runValidationTasks("author", value);
           }
-          setPublish_status(value);
+          setAuthor(value);
         }}
-        onBlur={() => runValidationTasks("publish_status", publish_status)}
-        errorMessage={errors.publish_status?.errorMessage}
-        hasError={errors.publish_status?.hasError}
-        {...getOverrideProps(overrides, "publish_status")}
-      ></SwitchField>
+        onBlur={() => runValidationTasks("author", author)}
+        errorMessage={errors.author?.errorMessage}
+        hasError={errors.author?.hasError}
+        {...getOverrideProps(overrides, "author")}
+      ></TextField>
       <Flex
         justifyContent="space-between"
         {...getOverrideProps(overrides, "CTAFlex")}

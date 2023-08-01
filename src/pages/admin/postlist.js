@@ -4,6 +4,7 @@ import { DataStore, Predicates, SortDirection } from '@aws-amplify/datastore';
 import { Post } from '../../models';
 import { useState, useEffect } from 'react';
 import { Table, TableCell, TableBody, TableHead, TableRow } from '@aws-amplify/ui-react';
+import { Authenticator } from '@aws-amplify/ui-react';
 
 const PostList = () => {
     const [posts, setPosts] = useState([])
@@ -14,15 +15,15 @@ const PostList = () => {
     }, [])
 
     async function doInit() {
-        console.log("init...")
+        console.log("doInit")
         const items = await DataStore.query(Post, Predicates.ALL, {
-            sort:(s) => s.createdAt(SortDirection.ASCENDING),
+            sort:(s) => s.createdAt(SortDirection.DESCENDING),
         })
-        //const items = await DataStore.query(Post)
-        console.log("get items.")
         setPosts(items)
     }
     return (
+        <Authenticator hideSignUp={true}>
+        {({ signOut, user }) => ( 
         <>
             <Table
               caption={""}
@@ -48,6 +49,8 @@ const PostList = () => {
                 </TableBody>
             </Table>
         </>
+        )}
+        </Authenticator>
     )
 }
 

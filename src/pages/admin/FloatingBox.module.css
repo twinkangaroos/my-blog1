@@ -1,0 +1,14 @@
+/* for test3.js */
+.container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+  }
+  
+  .floatingBox {
+    padding: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* シャドウを追加 */
+    border-radius: 4px;
+    background-color: #fff;
+  }

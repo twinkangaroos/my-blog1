@@ -24,10 +24,10 @@ export const schema = {
                     "isRequired": false,
                     "attributes": []
                 },
-                "publish_status": {
-                    "name": "publish_status",
+                "author": {
+                    "name": "author",
                     "isArray": false,
-                    "type": "Boolean",
+                    "type": "String",
                     "isRequired": false,
                     "attributes": []
                 },
@@ -77,5 +77,5 @@ export const schema = {
     "enums": {},
     "nonModels": {},
     "codegenVersion": "3.3.5",
-    "version": "31a64afc8e9b826ce5d6d5ef81a91c29"
+    "version": "20b08802649018d61e765e4b0577a8de"
 };

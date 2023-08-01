@@ -2,6 +2,6 @@ type Post @model @auth(rules: [{allow: public}]) {
   id: ID!
   title: String
   content: String
-  publish_status: Boolean
+  author: String
 }
  

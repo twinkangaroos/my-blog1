@@ -14,7 +14,7 @@ type EagerPost = {
   readonly id: string;
   readonly title?: string | null;
   readonly content?: string | null;
-  readonly publish_status?: boolean | null;
+  readonly author?: string | null;
   readonly createdAt?: string | null;
   readonly updatedAt?: string | null;
 }
@@ -27,7 +27,7 @@ type LazyPost = {
   readonly id: string;
   readonly title?: string | null;
   readonly content?: string | null;
-  readonly publish_status?: boolean | null;
+  readonly author?: string | null;
   readonly createdAt?: string | null;
   readonly updatedAt?: string | null;
 }
