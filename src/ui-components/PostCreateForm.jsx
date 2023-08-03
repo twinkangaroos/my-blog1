@@ -26,21 +26,25 @@ export default function PostCreateForm(props) {
     title: "",
     content: "",
     author: "",
+    show_date: "",
   };
   const [title, setTitle] = React.useState(initialValues.title);
   const [content, setContent] = React.useState(initialValues.content);
   const [author, setAuthor] = React.useState(initialValues.author);
+  const [show_date, setShow_date] = React.useState(initialValues.show_date);
   const [errors, setErrors] = React.useState({});
   const resetStateValues = () => {
     setTitle(initialValues.title);
     setContent(initialValues.content);
     setAuthor(initialValues.author);
+    setShow_date(initialValues.show_date);
     setErrors({});
   };
   const validations = {
     title: [],
     content: [],
     author: [],
+    show_date: [],
   };
   const runValidationTasks = async (
     fieldName,
@@ -70,6 +74,7 @@ export default function PostCreateForm(props) {
           title,
           content,
           author,
+          show_date,
         };
         const validationResponses = await Promise.all(
           Object.keys(validations).reduce((promises, fieldName) => {
@@ -127,6 +132,7 @@ export default function PostCreateForm(props) {
               title: value,
               content,
               author,
+              show_date,
             };
             const result = onChange(modelFields);
             value = result?.title ?? value;
@@ -153,6 +159,7 @@ export default function PostCreateForm(props) {
               title,
               content: value,
               author,
+              show_date,
             };
             const result = onChange(modelFields);
             value = result?.content ?? value;
@@ -179,6 +186,7 @@ export default function PostCreateForm(props) {
               title,
               content,
               author: value,
+              show_date,
             };
             const result = onChange(modelFields);
             value = result?.author ?? value;
@@ -192,6 +200,34 @@ export default function PostCreateForm(props) {
         errorMessage={errors.author?.errorMessage}
         hasError={errors.author?.hasError}
         {...getOverrideProps(overrides, "author")}
+      ></TextField>
+      <TextField
+        label="Show date"
+        isRequired={false}
+        isReadOnly={false}
+        type="date"
+        value={show_date}
+        onChange={(e) => {
+          let { value } = e.target;
+          if (onChange) {
+            const modelFields = {
+              title,
+              content,
+              author,
+              show_date: value,
+            };
+            const result = onChange(modelFields);
+            value = result?.show_date ?? value;
+          }
+          if (errors.show_date?.hasError) {
+            runValidationTasks("show_date", value);
+          }
+          setShow_date(value);
+        }}
+        onBlur={() => runValidationTasks("show_date", show_date)}
+        errorMessage={errors.show_date?.errorMessage}
+        hasError={errors.show_date?.hasError}
+        {...getOverrideProps(overrides, "show_date")}
       ></TextField>
       <Flex
         justifyContent="space-between"

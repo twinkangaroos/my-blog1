@@ -8,13 +8,13 @@
 import * as React from "react";
 import { Button, Flex, Grid, TextField } from "@aws-amplify/ui-react";
 import { getOverrideProps } from "@aws-amplify/ui-react/internal";
-import { Post } from "../models";
+import { PostList } from "../models";
 import { fetchByPath, validateField } from "./utils";
 import { DataStore } from "aws-amplify";
-export default function PostUpdateForm(props) {
+export default function PostListUpdateForm(props) {
   const {
     id: idProp,
-    post,
+    postList,
     onSuccess,
     onError,
     onSubmit,
@@ -24,40 +24,38 @@ export default function PostUpdateForm(props) {
     ...rest
   } = props;
   const initialValues = {
-    title: "",
-    content: "",
-    author: "",
-    show_date: "",
+    conttent: "",
+    type: "",
+    sort: "",
   };
-  const [title, setTitle] = React.useState(initialValues.title);
-  const [content, setContent] = React.useState(initialValues.content);
-  const [author, setAuthor] = React.useState(initialValues.author);
-  const [show_date, setShow_date] = React.useState(initialValues.show_date);
+  const [conttent, setConttent] = React.useState(initialValues.conttent);
+  const [type, setType] = React.useState(initialValues.type);
+  const [sort, setSort] = React.useState(initialValues.sort);
   const [errors, setErrors] = React.useState({});
   const resetStateValues = () => {
-    const cleanValues = postRecord
-      ? { ...initialValues, ...postRecord }
+    const cleanValues = postListRecord
+      ? { ...initialValues, ...postListRecord }
       : initialValues;
-    setTitle(cleanValues.title);
-    setContent(cleanValues.content);
-    setAuthor(cleanValues.author);
-    setShow_date(cleanValues.show_date);
+    setConttent(cleanValues.conttent);
+    setType(cleanValues.type);
+    setSort(cleanValues.sort);
     setErrors({});
   };
-  const [postRecord, setPostRecord] = React.useState(post);
+  const [postListRecord, setPostListRecord] = React.useState(postList);
   React.useEffect(() => {
     const queryData = async () => {
-      const record = idProp ? await DataStore.query(Post, idProp) : post;
-      setPostRecord(record);
+      const record = idProp
+        ? await DataStore.query(PostList, idProp)
+        : postList;
+      setPostListRecord(record);
     };
     queryData();
-  }, [idProp, post]);
-  React.useEffect(resetStateValues, [postRecord]);
+  }, [idProp, postList]);
+  React.useEffect(resetStateValues, [postListRecord]);
   const validations = {
-    title: [],
-    content: [],
-    author: [],
-    show_date: [],
+    conttent: [],
+    type: [],
+    sort: [],
   };
   const runValidationTasks = async (
     fieldName,
@@ -84,10 +82,9 @@ export default function PostUpdateForm(props) {
       onSubmit={async (event) => {
         event.preventDefault();
         let modelFields = {
-          title,
-          content,
-          author,
-          show_date,
+          conttent,
+          type,
+          sort,
         };
         const validationResponses = await Promise.all(
           Object.keys(validations).reduce((promises, fieldName) => {
@@ -118,7 +115,7 @@ export default function PostUpdateForm(props) {
             }
           });
           await DataStore.save(
-            Post.copyOf(postRecord, (updated) => {
+            PostList.copyOf(postListRecord, (updated) => {
               Object.assign(updated, modelFields);
             })
           );
@@ -131,117 +128,90 @@ export default function PostUpdateForm(props) {
           }
         }
       }}
-      {...getOverrideProps(overrides, "PostUpdateForm")}
+      {...getOverrideProps(overrides, "PostListUpdateForm")}
       {...rest}
     >
       <TextField
-        label="Title"
+        label="Conttent"
         isRequired={false}
         isReadOnly={false}
-        value={title}
+        value={conttent}
         onChange={(e) => {
           let { value } = e.target;
           if (onChange) {
             const modelFields = {
-              title: value,
-              content,
-              author,
-              show_date,
+              conttent: value,
+              type,
+              sort,
             };
             const result = onChange(modelFields);
-            value = result?.title ?? value;
+            value = result?.conttent ?? value;
           }
-          if (errors.title?.hasError) {
-            runValidationTasks("title", value);
+          if (errors.conttent?.hasError) {
+            runValidationTasks("conttent", value);
           }
-          setTitle(value);
+          setConttent(value);
         }}
-        onBlur={() => runValidationTasks("title", title)}
-        errorMessage={errors.title?.errorMessage}
-        hasError={errors.title?.hasError}
-        {...getOverrideProps(overrides, "title")}
+        onBlur={() => runValidationTasks("conttent", conttent)}
+        errorMessage={errors.conttent?.errorMessage}
+        hasError={errors.conttent?.hasError}
+        {...getOverrideProps(overrides, "conttent")}
       ></TextField>
       <TextField
-        label="Content"
+        label="Type"
         isRequired={false}
         isReadOnly={false}
-        value={content}
+        value={type}
         onChange={(e) => {
           let { value } = e.target;
           if (onChange) {
             const modelFields = {
-              title,
-              content: value,
-              author,
-              show_date,
+              conttent,
+              type: value,
+              sort,
             };
             const result = onChange(modelFields);
-            value = result?.content ?? value;
+            value = result?.type ?? value;
           }
-          if (errors.content?.hasError) {
-            runValidationTasks("content", value);
+          if (errors.type?.hasError) {
+            runValidationTasks("type", value);
           }
-          setContent(value);
+          setType(value);
         }}
-        onBlur={() => runValidationTasks("content", content)}
-        errorMessage={errors.content?.errorMessage}
-        hasError={errors.content?.hasError}
-        {...getOverrideProps(overrides, "content")}
+        onBlur={() => runValidationTasks("type", type)}
+        errorMessage={errors.type?.errorMessage}
+        hasError={errors.type?.hasError}
+        {...getOverrideProps(overrides, "type")}
       ></TextField>
       <TextField
-        label="Author"
+        label="Sort"
         isRequired={false}
         isReadOnly={false}
-        value={author}
+        type="number"
+        step="any"
+        value={sort}
         onChange={(e) => {
-          let { value } = e.target;
+          let value = isNaN(parseInt(e.target.value))
+            ? e.target.value
+            : parseInt(e.target.value);
           if (onChange) {
             const modelFields = {
-              title,
-              content,
-              author: value,
-              show_date,
+              conttent,
+              type,
+              sort: value,
             };
             const result = onChange(modelFields);
-            value = result?.author ?? value;
+            value = result?.sort ?? value;
           }
-          if (errors.author?.hasError) {
-            runValidationTasks("author", value);
+          if (errors.sort?.hasError) {
+            runValidationTasks("sort", value);
           }
-          setAuthor(value);
+          setSort(value);
         }}
-        onBlur={() => runValidationTasks("author", author)}
-        errorMessage={errors.author?.errorMessage}
-        hasError={errors.author?.hasError}
-        {...getOverrideProps(overrides, "author")}
-      ></TextField>
-      <TextField
-        label="Show date"
-        isRequired={false}
-        isReadOnly={false}
-        type="date"
-        value={show_date}
-        onChange={(e) => {
-          let { value } = e.target;
-          if (onChange) {
-            const modelFields = {
-              title,
-              content,
-              author,
-              show_date: value,
-            };
-            const result = onChange(modelFields);
-            value = result?.show_date ?? value;
-          }
-          if (errors.show_date?.hasError) {
-            runValidationTasks("show_date", value);
-          }
-          setShow_date(value);
-        }}
-        onBlur={() => runValidationTasks("show_date", show_date)}
-        errorMessage={errors.show_date?.errorMessage}
-        hasError={errors.show_date?.hasError}
-        {...getOverrideProps(overrides, "show_date")}
+        onBlur={() => runValidationTasks("sort", sort)}
+        errorMessage={errors.sort?.errorMessage}
+        hasError={errors.sort?.hasError}
+        {...getOverrideProps(overrides, "sort")}
       ></TextField>
       <Flex
         justifyContent="space-between"
@@ -254,7 +224,7 @@ export default function PostUpdateForm(props) {
             event.preventDefault();
             resetStateValues();
           }}
-          isDisabled={!(idProp || post)}
+          isDisabled={!(idProp || postList)}
           {...getOverrideProps(overrides, "ResetButton")}
         ></Button>
         <Flex
@@ -266,7 +236,7 @@ export default function PostUpdateForm(props) {
             type="submit"
             variation="primary"
             isDisabled={
-              !(idProp || post) ||
+              !(idProp || postList) ||
               Object.values(errors).some((e) => e?.hasError)
             }
             {...getOverrideProps(overrides, "SubmitButton")}

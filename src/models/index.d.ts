@@ -1,10 +1,46 @@
 import { ModelInit, MutableModel, __modelMeta__, ManagedIdentifier } from "@aws-amplify/datastore";
 // @ts-ignore
-import { LazyLoading, LazyLoadingDisabled } from "@aws-amplify/datastore";
+import { LazyLoading, LazyLoadingDisabled, AsyncItem } from "@aws-amplify/datastore";
 
 
 
 
+
+type EagerPostList = {
+  readonly [__modelMeta__]: {
+    identifier: ManagedIdentifier<PostList, 'id'>;
+    readOnlyFields: 'createdAt' | 'updatedAt';
+  };
+  readonly id: string;
+  readonly Post?: Post | null;
+  readonly conttent?: string | null;
+  readonly type?: string | null;
+  readonly sort?: number | null;
+  readonly createdAt?: string | null;
+  readonly updatedAt?: string | null;
+  readonly postListPostId?: string | null;
+}
+
+type LazyPostList = {
+  readonly [__modelMeta__]: {
+    identifier: ManagedIdentifier<PostList, 'id'>;
+    readOnlyFields: 'createdAt' | 'updatedAt';
+  };
+  readonly id: string;
+  readonly Post: AsyncItem<Post | undefined>;
+  readonly conttent?: string | null;
+  readonly type?: string | null;
+  readonly sort?: number | null;
+  readonly createdAt?: string | null;
+  readonly updatedAt?: string | null;
+  readonly postListPostId?: string | null;
+}
+
+export declare type PostList = LazyLoading extends LazyLoadingDisabled ? EagerPostList : LazyPostList
+
+export declare const PostList: (new (init: ModelInit<PostList>) => PostList) & {
+  copyOf(source: PostList, mutator: (draft: MutableModel<PostList>) => MutableModel<PostList> | void): PostList;
+}
 
 type EagerPost = {
   readonly [__modelMeta__]: {
@@ -15,6 +51,7 @@ type EagerPost = {
   readonly title?: string | null;
   readonly content?: string | null;
   readonly author?: string | null;
+  readonly show_date?: string | null;
   readonly createdAt?: string | null;
   readonly updatedAt?: string | null;
 }
@@ -28,6 +65,7 @@ type LazyPost = {
   readonly title?: string | null;
   readonly content?: string | null;
   readonly author?: string | null;
+  readonly show_date?: string | null;
   readonly createdAt?: string | null;
   readonly updatedAt?: string | null;
 }
