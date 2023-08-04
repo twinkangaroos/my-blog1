@@ -14,21 +14,24 @@ export declare type ValidationResponse = {
 };
 export declare type ValidationFunction<T> = (value: T, validationResponse: ValidationResponse) => ValidationResponse | Promise<ValidationResponse>;
 export declare type PostListUpdateFormInputValues = {
-    conttent?: string;
+    content?: string;
     type?: string;
     sort?: number;
+    post_id?: string;
 };
 export declare type PostListUpdateFormValidationValues = {
-    conttent?: ValidationFunction<string>;
+    content?: ValidationFunction<string>;
     type?: ValidationFunction<string>;
     sort?: ValidationFunction<number>;
+    post_id?: ValidationFunction<string>;
 };
 export declare type PrimitiveOverrideProps<T> = Partial<T> & React.DOMAttributes<HTMLDivElement>;
 export declare type PostListUpdateFormOverridesProps = {
     PostListUpdateFormGrid?: PrimitiveOverrideProps<GridProps>;
-    conttent?: PrimitiveOverrideProps<TextFieldProps>;
+    content?: PrimitiveOverrideProps<TextFieldProps>;
     type?: PrimitiveOverrideProps<TextFieldProps>;
     sort?: PrimitiveOverrideProps<TextFieldProps>;
+    post_id?: PrimitiveOverrideProps<TextFieldProps>;
 } & EscapeHatchProps;
 export declare type PostListUpdateFormProps = React.PropsWithChildren<{
     overrides?: PostListUpdateFormOverridesProps | undefined | null;

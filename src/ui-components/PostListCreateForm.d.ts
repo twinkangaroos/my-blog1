@@ -13,21 +13,24 @@ export declare type ValidationResponse = {
 };
 export declare type ValidationFunction<T> = (value: T, validationResponse: ValidationResponse) => ValidationResponse | Promise<ValidationResponse>;
 export declare type PostListCreateFormInputValues = {
-    conttent?: string;
+    content?: string;
     type?: string;
     sort?: number;
+    post_id?: string;
 };
 export declare type PostListCreateFormValidationValues = {
-    conttent?: ValidationFunction<string>;
+    content?: ValidationFunction<string>;
     type?: ValidationFunction<string>;
     sort?: ValidationFunction<number>;
+    post_id?: ValidationFunction<string>;
 };
 export declare type PrimitiveOverrideProps<T> = Partial<T> & React.DOMAttributes<HTMLDivElement>;
 export declare type PostListCreateFormOverridesProps = {
     PostListCreateFormGrid?: PrimitiveOverrideProps<GridProps>;
-    conttent?: PrimitiveOverrideProps<TextFieldProps>;
+    content?: PrimitiveOverrideProps<TextFieldProps>;
     type?: PrimitiveOverrideProps<TextFieldProps>;
     sort?: PrimitiveOverrideProps<TextFieldProps>;
+    post_id?: PrimitiveOverrideProps<TextFieldProps>;
 } & EscapeHatchProps;
 export declare type PostListCreateFormProps = React.PropsWithChildren<{
     overrides?: PostListCreateFormOverridesProps | undefined | null;

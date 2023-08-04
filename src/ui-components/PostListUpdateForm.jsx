@@ -24,21 +24,24 @@ export default function PostListUpdateForm(props) {
     ...rest
   } = props;
   const initialValues = {
-    conttent: "",
+    content: "",
     type: "",
     sort: "",
+    post_id: "",
   };
-  const [conttent, setConttent] = React.useState(initialValues.conttent);
+  const [content, setContent] = React.useState(initialValues.content);
   const [type, setType] = React.useState(initialValues.type);
   const [sort, setSort] = React.useState(initialValues.sort);
+  const [post_id, setPost_id] = React.useState(initialValues.post_id);
   const [errors, setErrors] = React.useState({});
   const resetStateValues = () => {
     const cleanValues = postListRecord
       ? { ...initialValues, ...postListRecord }
       : initialValues;
-    setConttent(cleanValues.conttent);
+    setContent(cleanValues.content);
     setType(cleanValues.type);
     setSort(cleanValues.sort);
+    setPost_id(cleanValues.post_id);
     setErrors({});
   };
   const [postListRecord, setPostListRecord] = React.useState(postList);
@@ -53,9 +56,10 @@ export default function PostListUpdateForm(props) {
   }, [idProp, postList]);
   React.useEffect(resetStateValues, [postListRecord]);
   const validations = {
-    conttent: [],
+    content: [],
     type: [],
     sort: [],
+    post_id: [],
   };
   const runValidationTasks = async (
     fieldName,
@@ -82,9 +86,10 @@ export default function PostListUpdateForm(props) {
       onSubmit={async (event) => {
         event.preventDefault();
         let modelFields = {
-          conttent,
+          content,
           type,
           sort,
+          post_id,
         };
         const validationResponses = await Promise.all(
           Object.keys(validations).reduce((promises, fieldName) => {
@@ -132,30 +137,31 @@ export default function PostListUpdateForm(props) {
       {...rest}
     >
       <TextField
-        label="Conttent"
+        label="Content"
         isRequired={false}
         isReadOnly={false}
-        value={conttent}
+        value={content}
         onChange={(e) => {
           let { value } = e.target;
           if (onChange) {
             const modelFields = {
-              conttent: value,
+              content: value,
               type,
               sort,
+              post_id,
             };
             const result = onChange(modelFields);
-            value = result?.conttent ?? value;
+            value = result?.content ?? value;
           }
-          if (errors.conttent?.hasError) {
-            runValidationTasks("conttent", value);
+          if (errors.content?.hasError) {
+            runValidationTasks("content", value);
           }
-          setConttent(value);
+          setContent(value);
         }}
-        onBlur={() => runValidationTasks("conttent", conttent)}
-        errorMessage={errors.conttent?.errorMessage}
-        hasError={errors.conttent?.hasError}
-        {...getOverrideProps(overrides, "conttent")}
+        onBlur={() => runValidationTasks("content", content)}
+        errorMessage={errors.content?.errorMessage}
+        hasError={errors.content?.hasError}
+        {...getOverrideProps(overrides, "content")}
       ></TextField>
       <TextField
         label="Type"
@@ -166,9 +172,10 @@ export default function PostListUpdateForm(props) {
           let { value } = e.target;
           if (onChange) {
             const modelFields = {
-              conttent,
+              content,
               type: value,
               sort,
+              post_id,
             };
             const result = onChange(modelFields);
             value = result?.type ?? value;
@@ -196,9 +203,10 @@ export default function PostListUpdateForm(props) {
             : parseInt(e.target.value);
           if (onChange) {
             const modelFields = {
-              conttent,
+              content,
               type,
               sort: value,
+              post_id,
             };
             const result = onChange(modelFields);
             value = result?.sort ?? value;
@@ -212,6 +220,33 @@ export default function PostListUpdateForm(props) {
         errorMessage={errors.sort?.errorMessage}
         hasError={errors.sort?.hasError}
         {...getOverrideProps(overrides, "sort")}
+      ></TextField>
+      <TextField
+        label="Post id"
+        isRequired={false}
+        isReadOnly={false}
+        value={post_id}
+        onChange={(e) => {
+          let { value } = e.target;
+          if (onChange) {
+            const modelFields = {
+              content,
+              type,
+              sort,
+              post_id: value,
+            };
+            const result = onChange(modelFields);
+            value = result?.post_id ?? value;
+          }
+          if (errors.post_id?.hasError) {
+            runValidationTasks("post_id", value);
+          }
+          setPost_id(value);
+        }}
+        onBlur={() => runValidationTasks("post_id", post_id)}
+        errorMessage={errors.post_id?.errorMessage}
+        hasError={errors.post_id?.hasError}
+        {...getOverrideProps(overrides, "post_id")}
       ></TextField>
       <Flex
         justifyContent="space-between"

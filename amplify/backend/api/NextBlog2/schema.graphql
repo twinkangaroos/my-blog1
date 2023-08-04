@@ -1,9 +1,9 @@
 type PostList @model @auth(rules: [{allow: public}]) {
   id: ID!
-  Post: Post @hasOne
-  conttent: String
+  content: String
   type: String
   sort: Int
+  post_id: String
 }
 
 type Post @model @auth(rules: [{allow: public}]) {

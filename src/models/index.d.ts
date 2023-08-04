@@ -1,6 +1,6 @@
 import { ModelInit, MutableModel, __modelMeta__, ManagedIdentifier } from "@aws-amplify/datastore";
 // @ts-ignore
-import { LazyLoading, LazyLoadingDisabled, AsyncItem } from "@aws-amplify/datastore";
+import { LazyLoading, LazyLoadingDisabled } from "@aws-amplify/datastore";
 
 
 
@@ -12,13 +12,12 @@ type EagerPostList = {
     readOnlyFields: 'createdAt' | 'updatedAt';
   };
   readonly id: string;
-  readonly Post?: Post | null;
-  readonly conttent?: string | null;
+  readonly content?: string | null;
   readonly type?: string | null;
   readonly sort?: number | null;
+  readonly post_id?: string | null;
   readonly createdAt?: string | null;
   readonly updatedAt?: string | null;
-  readonly postListPostId?: string | null;
 }
 
 type LazyPostList = {
@@ -27,13 +26,12 @@ type LazyPostList = {
     readOnlyFields: 'createdAt' | 'updatedAt';
   };
   readonly id: string;
-  readonly Post: AsyncItem<Post | undefined>;
-  readonly conttent?: string | null;
+  readonly content?: string | null;
   readonly type?: string | null;
   readonly sort?: number | null;
+  readonly post_id?: string | null;
   readonly createdAt?: string | null;
   readonly updatedAt?: string | null;
-  readonly postListPostId?: string | null;
 }
 
 export declare type PostList = LazyLoading extends LazyLoadingDisabled ? EagerPostList : LazyPostList

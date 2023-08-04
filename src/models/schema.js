@@ -10,26 +10,8 @@ export const schema = {
                     "isRequired": true,
                     "attributes": []
                 },
-                "Post": {
-                    "name": "Post",
-                    "isArray": false,
-                    "type": {
-                        "model": "Post"
-                    },
-                    "isRequired": false,
-                    "attributes": [],
-                    "association": {
-                        "connectionType": "HAS_ONE",
-                        "associatedWith": [
-                            "id"
-                        ],
-                        "targetNames": [
-                            "postListPostId"
-                        ]
-                    }
-                },
-                "conttent": {
-                    "name": "conttent",
+                "content": {
+                    "name": "content",
                     "isArray": false,
                     "type": "String",
                     "isRequired": false,
@@ -49,6 +31,13 @@ export const schema = {
                     "isRequired": false,
                     "attributes": []
                 },
+                "post_id": {
+                    "name": "post_id",
+                    "isArray": false,
+                    "type": "String",
+                    "isRequired": false,
+                    "attributes": []
+                },
                 "createdAt": {
                     "name": "createdAt",
                     "isArray": false,
@@ -64,13 +53,6 @@ export const schema = {
                     "isRequired": false,
                     "attributes": [],
                     "isReadOnly": true
-                },
-                "postListPostId": {
-                    "name": "postListPostId",
-                    "isArray": false,
-                    "type": "ID",
-                    "isRequired": false,
-                    "attributes": []
                 }
             },
             "syncable": true,
@@ -182,5 +164,5 @@ export const schema = {
     "enums": {},
     "nonModels": {},
     "codegenVersion": "3.3.5",
-    "version": "e373c45aabe9b5286e6ae10c53a2f8ea"
+    "version": "b1a1888f4638508b9da47f07ce2bb19c"
 };
