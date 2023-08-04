@@ -18,7 +18,7 @@ const PostDetail = () => {
     // パスパラメータからidを取得
     const router = useRouter()
     const param_id = router.query.id
-    const { tokens } = useTheme();
+    const { tokens } = useTheme()
 
     // 初期ロード時の処理
     useEffect(() => {
@@ -94,17 +94,18 @@ const PostDetail = () => {
                 }
                 
                 // PostListの最新情報を取得してstateを更新
-                const post_list_result = await DataStore.query(PostList, (c) => c.post_id.eq(param_id));
+                const post_list_result = await DataStore.query(PostList, (c) => c.post_id.eq(param_id))
                 if (post_list_result && post_list_result.length > 0) {
-                    setPostList(post_list_result);
+                    setPostList(post_list_result)
                 }
 
-                console.log("更新が完了しました");
+                console.log("更新が完了しました。")
+                alert("更新が完了しました。")
             } else {
                 console.log("記事が見つかりません")
             }
         } catch (error) {
-            console.error('更新時にエラーが発生しました:', error);
+            console.error('更新時にエラーが発生しました:', error)
         }
     }
 
@@ -132,17 +133,34 @@ const PostDetail = () => {
     
     // テキストエリアの値が変更された時
     const handleOnChange = (e, index) => {
+        console.log("handleOnChange...")
         const updatedContents = [...contents]
         updatedContents[index] = e.target.value
         setContents(updatedContents)
 
         const updatedPostList = post_list.map((pl, i) => {
             if (i === index) {
-                return { ...pl, content: e.target.value }
+                //return { ...pl, content: e.target.value }
+                const newRows = calculateRows(e.target.value); // 新しい行数を計算
+                console.log("newRows=", newRows)
+                return { ...pl, content: e.target.value, rows: newRows }; // rowsも更新する
             }
             return pl
         })
         setPostList(updatedPostList)
+    }
+
+    // テキストエリアの高さを計算する関数
+    const calculateRows = (text) => {
+        const lines = text.split('\n');
+        //return Math.max(lines.length, 1); // 最低でも1行の高さを確保する
+        console.log("lines.length=", lines.length)
+        let rowCount = Math.max(lines.length, 1); // 最低でも1行の高さを確保する
+        const maxLengthPerRow = 39; // 1行の最大文字数（全角39文字）
+        lines.forEach(line => {
+          rowCount += Math.ceil(line.length / maxLengthPerRow); // 行数を追加
+        });
+        return rowCount;
     }
 
     // 「テキストエリアを追加する」クリック時
@@ -166,7 +184,10 @@ const PostDetail = () => {
                 backgroundColor={tokens.colors.background.secondary}
                 padding={tokens.space.medium}
             >
-                <Heading level={5}>記事編集</Heading>
+                <Flex justifyContent="flex-end">
+                    <Button variation="primary" onClick={onUClick} size="small">更新する</Button>
+                </Flex>
+                
                 <Card>
                     <Flex direction="column" alignItems="flex-start" className="ProseMirror note-common-styles__textnote-body">
                         <TextField
@@ -174,10 +195,11 @@ const PostDetail = () => {
                             //label=""
                             errorMessage="There is an error"
                             defaultValue={title}
-                            width="620px"
-                            variation="quiet"
+                            width="640px"
+                            //variation="quiet"
                             isRequired={true}
                             onChange={e => setTitle(e.target.value)}
+                            style={{ fontSize: '32px', fontWeight: 'bold', border: 'none' }}
                         />
                         {
                             post_list.map((pl, index) => (
@@ -186,10 +208,13 @@ const PostDetail = () => {
                                     ref={(el) => (inputEls.current[index] = el)}
                                     value={pl.content}
                                     onChange={(e) => handleOnChange(e, index)}
-                                    rows={pl.content ? pl.content.split('\n').length : 1} // 改行の数に応じてrowsを増やす
-                                    width="620px"
-                                    style={{ border: 'none', outline: 'none', resize: 'none', width: '100%' }} // 枠線をゼロにするCSSスタイルを適用
+                                    //rows={pl.content ? pl.content.split('\n').length : 1} // 改行の数に応じてrowsを増やす
+                                    //rows={calculateRows(pl.content)} // 文字数に応じて動的に高さを計算する
+                                    rows={pl.rows || 1} // 初期値を1として、行数が計算されていない場合は1を使う
+                                    width="640px"
+                                    style={{ border: 'none', outline: 'none', lineHeight: '1.5' }} // 枠線をゼロにするCSSスタイルを適用
                                     //onSelect={(e) => handleTextAreaSelect(e, index)}
+                                    resize="vertical"
                                 />
 
                             ))
@@ -197,7 +222,7 @@ const PostDetail = () => {
                         <Button variation="primary" onClick={handleAddTextArea}>テキストエリアを追加する</Button>
                         
                         <Flex direction="row" alignItems="flex-start">
-                            <Button variation="primary" onClick={onUClick}>更新する</Button>
+                            
                             <Button variation="warning" onClick={onDClick}>削除する</Button>
                         </Flex>
                     </Flex>
