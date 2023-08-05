@@ -22,7 +22,6 @@ const PostComponent = () => {
 
     async function doInit() {
         if (param_id) {
-            console.log("doInit getPost...", param_id)
             setId(param_id)
             // Post取得
             const post_result = await DataStore.query(Post, (c) => c.id.eq(param_id))
@@ -51,30 +50,39 @@ const PostComponent = () => {
                 padding={tokens.space.medium}
             >
                 <Card>
-                    <Flex 
-                        direction="column" 
-                        alignItems="flex-start" 
-                        className="ProseMirror note-common-styles__textnote-body"
-                        width="640px"
-                    >
-                        <Text
-                            level={2}
-                            width="100%"
-                            style={{ fontSize: '32px', fontWeight: 'bold', padding: '8px 16px 8px 16px' }}
-                        >
-                            {post.title}
-                        </Text>
+                    <Flex direction="column" alignItems="flex-start" className="ProseMirror note-common-styles__textnote-body">
+                        <h1
+                            style={{ border: 'none', outline: 'none', lineHeight: '1.5', width: "640px" }}
+                            dangerouslySetInnerHTML={{ __html: post.title ? post.title : '' }}
+                        />
                         {
-                            post_list.map((pl, index) => (
-                                <Flex
-                                    key={index}
-                                    width="100%"
-                                    style={{ padding: '8px 16px 8px 16px', lineHeight: '1.5' }}
-                                >
-                                    <p dangerouslySetInnerHTML={{ __html: pl.content.replace(/\n/g, '<br />') }} 
-                                        style={{lineHeight: '1.5'}} />
-                                </Flex>
-                            ))
+                            post_list.length > 0 ?
+                            post_list.map((postItem, index) => {
+                                const { type, content } = postItem
+                                if (type === "div") {
+                                    return (
+                                        <Flex key={index + "_head"}>
+                                            <div
+                                                key={index}
+                                                style={{ border: 'none', outline: 'none', lineHeight: '1.5', width: "640px"  }}
+                                                dangerouslySetInnerHTML={{ __html: content ? content.replace(/\n/g, '<br />') : '' }}
+                                            />
+                                        </Flex>
+                                    )
+                                } else if (type === "h2") {
+                                    return (
+                                        <Flex key={index + "_head"}>
+                                            <h2
+                                                key={index}
+                                                style={{ border: 'none', outline: 'none', lineHeight: '1.5', width: "640px"  }}
+                                                dangerouslySetInnerHTML={{ __html: content ? content.replace(/\n/g, '<br />') : '' }}
+                                            />
+                                        </Flex>
+                                    )
+                                }
+                            })
+                            :
+                            <Loader />
                         }
                     </Flex>
                 </Card>

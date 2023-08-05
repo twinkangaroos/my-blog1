@@ -14,6 +14,7 @@ const PostDetail = () => {
     const [focusOnNextAdd, setFocusOnNextAdd] = useState(true); // 要素追加時にフォーカスを当てるかのフラグ
     const divRefs = useRef([]); // contenteditableの参照を保持する配列
     const titleRef = useRef(null); // title要素のrefを作成
+    const [selectedElementIndex, setSelectedElementIndex] = useState(-1);
 
     // パスパラメータからidを取得
     const router = useRouter()
@@ -67,7 +68,6 @@ const PostDetail = () => {
             if (id) {
                 if (titleRef.current) {
                     const updatedTitle = titleRef.current.innerText
-                    console.log("Updated Title:", updatedTitle)
                     // Postの更新
                     await DataStore.save(
                         Post.copyOf(
@@ -81,11 +81,8 @@ const PostDetail = () => {
                 }
                 
                 if (post_list && post_list.length > 0) {
-                    console.log("update: postList", post_list)
                     // PostListの全削除
-                    //for (const pl of post_list) {
-                        await DataStore.delete(PostList, (post_list) => post_list.post_id.eq(id))
-                    //}
+                    await DataStore.delete(PostList, (post_list) => post_list.post_id.eq(id))
                     console.log("All PostList successfully deleted.")
                     
                     // contenteditableの内容を取得（※追加したてのnullの考慮要）
@@ -176,10 +173,31 @@ const PostDetail = () => {
             if (el.innerText === '') {
                 // バックスペースキーが押されたときに内容が空なら要素を削除
                 setPostList(prevList => prevList.filter((_, i) => i !== index));
-                console.log("deleted postList", post_list)
             }
         }
     }
+
+    // 「上に移動」ボタンのクリック時
+    const handleMoveUp = (index) => {
+        if (index > 0) {
+        setPostList(prevList => {
+            const list = [...prevList];
+            [list[index - 1], list[index]] = [list[index], list[index - 1]];
+            return list;
+        });
+        }
+    };
+
+    // 「下に移動」ボタンのクリック時
+    const handleMoveDown = (index) => {
+        if (index < post_list.length - 1) {
+            setPostList(prevList => {
+                const list = [...prevList];
+                [list[index], list[index + 1]] = [list[index + 1], list[index]];
+                return list;
+            });
+        }
+    };
     
     return (
         <>
@@ -187,7 +205,15 @@ const PostDetail = () => {
                 backgroundColor={tokens.colors.background.secondary}
                 padding={tokens.space.medium}
             >
-                <Flex justifyContent="flex-end">
+                <Flex
+                    justifyContent="flex-end"
+                    style={{
+                        paddingBottom: '20px',
+                        position: 'sticky',
+                        top: 0, // 画面上部からの位置を指定します
+                        zIndex: 1, // 必要に応じてz-indexを調整します
+                    }}
+                >
                     <Button variation="warning" onClick={onUClick} size="small">更新する</Button>
                 </Flex>
                 
@@ -195,17 +221,18 @@ const PostDetail = () => {
                     <Flex direction="column" alignItems="flex-start" className="ProseMirror note-common-styles__textnote-body">
                         <h1
                             contentEditable
-                            style={{ border: 'none', outline: 'none', lineHeight: '1.5', width: "640px"  }}
+                            style={{ border: 'none', outline: 'none', lineHeight: '1.5', width: "640px" }}
                             dangerouslySetInnerHTML={{ __html: post.title ? post.title : '' }}
                             ref={titleRef} // refをtitle要素に紐付け
                             onKeyDown={handleKeyDownH1} // Enterキーの処理を行う
                         />
                         {
                             post_list.length > 0 ?
-                                post_list.map((postItem, index) => {
-                                    const { type, content } = postItem
-                                    if (type === "div") {
-                                        return (
+                            post_list.map((postItem, index) => {
+                                const { type, content } = postItem
+                                if (type === "div") {
+                                    return (
+                                        <Flex key={index + "_head"}>
                                             <div
                                                 key={index}
                                                 contentEditable
@@ -213,10 +240,17 @@ const PostDetail = () => {
                                                 dangerouslySetInnerHTML={{ __html: content ? content.replace(/\n/g, '<br />') : '' }}
                                                 ref={el => (divRefs.current[index] = el)}
                                                 onKeyDown={e => handleKeyDown(e, index)}
-                                            /> 
-                                        )
-                                    } else if (type === "h2") {
-                                        return (
+                                                onClick={() => setSelectedElementIndex(index) }
+                                            />
+                                            <Flex>
+                                                {index > 0 && <button className="amplify-button amplify-field-group__control amplify-button--default amplify-button--small" onClick={() => handleMoveUp(index)}>↑</button>}
+                                                {index < post_list.length - 1 && <button className="amplify-button amplify-field-group__control amplify-button--default amplify-button--small" onClick={() => handleMoveDown(index)}>↓</button>}
+                                            </Flex>
+                                        </Flex>
+                                    )
+                                } else if (type === "h2") {
+                                    return (
+                                        <Flex key={index + "_head"}>
                                             <h2
                                                 key={index}
                                                 contentEditable
@@ -224,12 +258,17 @@ const PostDetail = () => {
                                                 dangerouslySetInnerHTML={{ __html: content ? content.replace(/\n/g, '<br />') : '' }}
                                                 ref={el => (divRefs.current[index] = el)}
                                                 onKeyDown={e => handleKeyDown(e, index)}
-                                            /> 
-                                        )
-                                    }
-                                })
-                                :
-                                <Loader />
+                                            />
+                                            <Flex>
+                                                {index > 0 && <button className="amplify-button amplify-field-group__control amplify-button--default amplify-button--small" onClick={() => handleMoveUp(index)}>↑</button>}
+                                                {index < post_list.length - 1 && <button className="amplify-button amplify-field-group__control amplify-button--default amplify-button--small" onClick={() => handleMoveDown(index)}>↓</button>}
+                                            </Flex>
+                                        </Flex>
+                                    )
+                                }
+                            })
+                            :
+                            <Loader />
                         }
                         <Flex direction="row">
                             <Button variation="default" onClick={handleAddDiv} size="small">段落の追加</Button>
