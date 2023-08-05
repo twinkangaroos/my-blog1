@@ -3,8 +3,10 @@ import { useRouter } from 'next/router'
 import { DataStore, SortDirection } from '@aws-amplify/datastore';
 import { Post, PostList } from '../../../models';
 import { useState, useEffect } from 'react';
-import { Heading, Card, View, Flex, TextField, Button, TextAreaField, Text, useTheme, Link, Loader } from '@aws-amplify/ui-react';
+import { Card, View, Flex, Button, useTheme, Link, Loader } from '@aws-amplify/ui-react';
 import { useRef } from 'react';
+import { Authenticator } from '@aws-amplify/ui-react';
+import HeaderAdmin from "../../HeaderAdmin"
 
 const PostDetail = () => {
     const [post, setPost] = useState("")
@@ -200,6 +202,10 @@ const PostDetail = () => {
     };
     
     return (
+        <Authenticator.Provider>
+        <HeaderAdmin />
+        <Authenticator hideSignUp={true}>
+        {({ signOut, user }) => ( 
         <>
             <View
                 backgroundColor={tokens.colors.background.secondary}
@@ -214,6 +220,7 @@ const PostDetail = () => {
                         zIndex: 1, // 必要に応じてz-indexを調整します
                     }}
                 >
+                    <Button variation="link" size="small"><Link href="/admin/postlist">一覧に戻る</Link></Button>
                     <Button variation="warning" onClick={onUClick} size="small">更新する</Button>
                 </Flex>
                 
@@ -281,6 +288,9 @@ const PostDetail = () => {
                 </Card>
             </View>
         </>
+        )}
+        </Authenticator>
+        </Authenticator.Provider>
     )
 }
 

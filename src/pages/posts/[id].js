@@ -3,7 +3,8 @@ import { useRouter } from 'next/router'
 import { DataStore, SortDirection } from '@aws-amplify/datastore';
 import { Post, PostList } from '../../models';
 import { useState, useEffect } from 'react';
-import { Heading, Card, View, Flex, Text, useTheme } from '@aws-amplify/ui-react';
+import { Card, View, Flex, useTheme, Loader } from '@aws-amplify/ui-react';
+import Header from "../Header"
 
 const PostComponent = () => {
     const [post, setPost] = useState("")
@@ -45,6 +46,7 @@ const PostComponent = () => {
 
     return (
         <>
+            <Header />
             <View
                 backgroundColor={tokens.colors.background.secondary}
                 padding={tokens.space.medium}

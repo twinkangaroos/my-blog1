@@ -3,10 +3,9 @@ import { useState, useEffect} from 'react';
 import Link from 'next/link';
 import { DataStore } from '@aws-amplify/datastore';
 import { Post } from '../models';
-
-import Image from 'next/image'
 import { Inter } from 'next/font/google'
 const inter = Inter({ subsets: ['latin'] });
+import Header from "./Header"
 
 export default function Home() {
   const [posts, setPosts] = useState([])
@@ -21,15 +20,16 @@ export default function Home() {
     });
   }, [])
   return (
-    <div className={styles.container}>
-      <h1>投稿リスト</h1>
+    <>
+      <Header />
+      <h2>お知らせ一覧</h2>
       {
         posts.map(post => (
           <Link key={post.id} href={`/posts/${post.id}`}>
-            <h2>{post.title}</h2>
+            <h3>{post.title}</h3>
           </Link>
         ))
       }
-    </div>
+    </>
   )
 }
