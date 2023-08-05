@@ -10,10 +10,10 @@ const PostDetail = () => {
     const [post, setPost] = useState("")
     const [post_list, setPostList] = useState([])
     const [id, setId] = useState("")
-    const [title, setTitle] = useState("")
-    const divRefs = useRef([]); // contenteditableの参照を保持する配列
     const [post_list_flag, setPostListFlag] = useState(false)
     const [focusOnNextAdd, setFocusOnNextAdd] = useState(true); // 要素追加時にフォーカスを当てるかのフラグ
+    const divRefs = useRef([]); // contenteditableの参照を保持する配列
+    const titleRef = useRef(null); // title要素のrefを作成
 
     // パスパラメータからidを取得
     const router = useRouter()
@@ -42,7 +42,6 @@ const PostDetail = () => {
             const post_result = await DataStore.query(Post, (c) => c.id.eq(param_id))
             if (post_result && post_result.length > 0) {
                 setPost(post_result[0])
-                setTitle(post_result[0].title)
                 console.log("Success in taking Post.")
 
                 // PostList取得
@@ -66,22 +65,27 @@ const PostDetail = () => {
         e.preventDefault()
         try {
             if (id) {
-                // Postの更新
-                await DataStore.save(
-                    Post.copyOf(
-                        post, 
-                        updated => {
-                            updated.title = title
-                        }
+                if (titleRef.current) {
+                    const updatedTitle = titleRef.current.innerText
+                    console.log("Updated Title:", updatedTitle)
+                    // Postの更新
+                    await DataStore.save(
+                        Post.copyOf(
+                            post, 
+                            updated => {
+                                updated.title = updatedTitle
+                            }
+                        )
                     )
-                )
-                console.log("Post successfully updated.")
+                    console.log("Post successfully updated.") 
+                }
                 
                 if (post_list && post_list.length > 0) {
+                    console.log("update: postList", post_list)
                     // PostListの全削除
-                    for (const pl of post_list) {
-                        await DataStore.delete(PostList, pl.id);
-                    }
+                    //for (const pl of post_list) {
+                        await DataStore.delete(PostList, (post_list) => post_list.post_id.eq(id))
+                    //}
                     console.log("All PostList successfully deleted.")
                     
                     // contenteditableの内容を取得（※追加したてのnullの考慮要）
@@ -89,13 +93,11 @@ const PostDetail = () => {
                         const el = divRefs.current[index];
                         return el ? el.innerText : '';
                     })
-                    console.log("debug updatedContent=", updatedContent)
                     
                     // PostListの再作成
                     let i = 0
                     for (const pl of post_list) {
                         const updatedContentValue = updatedContent[i] // 更新後のcontentの値を取得
-                        console.log("updatedContent=", updatedContent)
                         await DataStore.save(
                             new PostList({
                                 "content": updatedContentValue,
@@ -160,6 +162,25 @@ const PostDetail = () => {
         setFocusOnNextAdd(true); // フォーカスを当てるフラグをtrueに設定
     }
     
+    // タイトルは改行禁止
+    const handleKeyDownH1 = (e) => {
+        if (e.key === 'Enter') {
+            e.preventDefault(); // Enterキーのデフォルトの改行処理を防ぐ
+        }
+    }
+
+    // 文字がない状態でバックスペース → 要素を削除
+    const handleKeyDown = (e, index) => {
+        if (e.key === 'Backspace') {
+            const el = divRefs.current[index];
+            if (el.innerText === '') {
+                // バックスペースキーが押されたときに内容が空なら要素を削除
+                setPostList(prevList => prevList.filter((_, i) => i !== index));
+                console.log("deleted postList", post_list)
+            }
+        }
+    }
+    
     return (
         <>
             <View
@@ -172,14 +193,12 @@ const PostDetail = () => {
                 
                 <Card>
                     <Flex direction="column" alignItems="flex-start" className="ProseMirror note-common-styles__textnote-body">
-                        <TextField
-                            placeholder="記事タイトル"
-                            errorMessage="There is an error"
-                            defaultValue={title}
-                            width="640px"
-                            isRequired={true}
-                            onChange={e => setTitle(e.target.value)}
-                            style={{ fontSize: '32px', fontWeight: 'bold', border: 'none' }}
+                        <h1
+                            contentEditable
+                            style={{ border: 'none', outline: 'none', lineHeight: '1.5', width: "640px"  }}
+                            dangerouslySetInnerHTML={{ __html: post.title ? post.title : '' }}
+                            ref={titleRef} // refをtitle要素に紐付け
+                            onKeyDown={handleKeyDownH1} // Enterキーの処理を行う
                         />
                         {
                             post_list.length > 0 ?
@@ -193,6 +212,7 @@ const PostDetail = () => {
                                                 style={{ border: 'none', outline: 'none', lineHeight: '1.5', width: "640px"  }}
                                                 dangerouslySetInnerHTML={{ __html: content ? content.replace(/\n/g, '<br />') : '' }}
                                                 ref={el => (divRefs.current[index] = el)}
+                                                onKeyDown={e => handleKeyDown(e, index)}
                                             /> 
                                         )
                                     } else if (type === "h2") {
@@ -203,6 +223,7 @@ const PostDetail = () => {
                                                 style={{ border: 'none', outline: 'none', lineHeight: '1.5', width: "640px"  }}
                                                 dangerouslySetInnerHTML={{ __html: content ? content.replace(/\n/g, '<br />') : '' }}
                                                 ref={el => (divRefs.current[index] = el)}
+                                                onKeyDown={e => handleKeyDown(e, index)}
                                             /> 
                                         )
                                     }
@@ -210,8 +231,10 @@ const PostDetail = () => {
                                 :
                                 <Loader />
                         }
-                        <Button variation="default" onClick={handleAddDiv} size="small">段落の追加</Button>
-                        <Button variation="default" onClick={handleAddH2} size="small">h2大見出しの追加</Button>
+                        <Flex direction="row">
+                            <Button variation="default" onClick={handleAddDiv} size="small">段落の追加</Button>
+                            <Button variation="default" onClick={handleAddH2} size="small">h2大見出しの追加</Button>
+                        </Flex>
                     </Flex>
                     <Flex justifyContent="flex-end">
                         <Link href="#" onClick={onDClick}>削除する</Link>
