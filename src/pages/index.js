@@ -15,6 +15,7 @@ export default function Home() {
       const postData = await DataStore.query(Post);
       setPosts(postData);
     }
+    // real time functionality
     DataStore.observe(Post).subscribe(()  => {
       fetchPosts();
     });

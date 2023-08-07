@@ -70,23 +70,29 @@ const PostDetail = () => {
             if (id) {
                 if (titleRef.current) {
                     const updatedTitle = titleRef.current.innerText
+                    console.log("title=",updatedTitle)
+                    const currentDate = new Date()
+                    // AWSDate 形式に変換
+                    const awsDate = currentDate.toISOString().split('T')[0]; // 'YYYY-MM-DD' 形式に変換
+
                     // Postの更新
                     await DataStore.save(
                         Post.copyOf(
                             post, 
                             updated => {
                                 updated.title = updatedTitle
+                                updated.show_date = awsDate
                             }
                         )
                     )
                     console.log("Post successfully updated.") 
                 }
                 
+                 // PostListの全削除
+                 await DataStore.delete(PostList, (post_list) => post_list.post_id.eq(id))
+                 console.log("All PostList successfully deleted.")
+
                 if (post_list && post_list.length > 0) {
-                    // PostListの全削除
-                    await DataStore.delete(PostList, (post_list) => post_list.post_id.eq(id))
-                    console.log("All PostList successfully deleted.")
-                    
                     // contenteditableの内容を取得（※追加したてのnullの考慮要）
                     const updatedContent = post_list.map((pl, index) => {
                         const el = divRefs.current[index];
@@ -110,6 +116,12 @@ const PostDetail = () => {
                     console.log("All PostList successfully created.")
                 }
                 
+                // Post再取得
+                const post_result = await DataStore.query(Post, (c) => c.id.eq(id))
+                if (post_result && post_result.length > 0) {
+                    setPost(post_result[0])
+                    console.log("Success in taking PostList again.")
+                }
                 // PostList再取得
                 const post_list_result = await DataStore.query(PostList, (c) => c.post_id.eq(param_id), {
                     sort:(s) => s.sort(SortDirection.ASCENDING),
@@ -179,16 +191,23 @@ const PostDetail = () => {
         }
     }
 
-    // 「上に移動」ボタンのクリック時
+    // 「上に移動」ボタンのクリック時（例：index=5 → 4）
     const handleMoveUp = (index) => {
         if (index > 0) {
-        setPostList(prevList => {
-            const list = [...prevList];
-            [list[index - 1], list[index]] = [list[index], list[index - 1]];
-            return list;
-        });
+            console.log("post_list", post_list)
+            // 要素をコピーして新しい配列を作成
+            const updatedList = [...post_list];
+            [updatedList[index - 1], updatedList[index]] = [updatedList[index], updatedList[index - 1]];
+            setPostList(updatedList); // stateの更新
+            console.log("updatedList", updatedList)
+            //setPostList(prevList => {
+            //    const list = [...prevList];
+            //    console.log("list", list)
+            //    [list[index - 1], list[index]] = [list[index], list[index - 1]];
+            //    return list;
+            //})
         }
-    };
+    }
 
     // 「下に移動」ボタンのクリック時
     const handleMoveDown = (index) => {
@@ -197,9 +216,9 @@ const PostDetail = () => {
                 const list = [...prevList];
                 [list[index], list[index + 1]] = [list[index + 1], list[index]];
                 return list;
-            });
+            })
         }
-    };
+    }
     
     return (
         <Authenticator.Provider>
