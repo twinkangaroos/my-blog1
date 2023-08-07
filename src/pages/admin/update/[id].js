@@ -1,9 +1,10 @@
 import '@aws-amplify/ui-react/styles.css';
+import styles from "../../../styles/editable.module.css"
 import { useRouter } from 'next/router'
 import { DataStore, SortDirection } from '@aws-amplify/datastore';
 import { Post, PostList } from '../../../models';
 import { useState, useEffect } from 'react';
-import { Card, View, Flex, Button, useTheme, Link, Loader } from '@aws-amplify/ui-react';
+import { Card, View, Flex, Button, useTheme, Link, Loader, RadioGroupField, Radio } from '@aws-amplify/ui-react';
 import { useRef } from 'react';
 import { Authenticator } from '@aws-amplify/ui-react';
 import HeaderAdmin from "../../HeaderAdmin"
@@ -17,7 +18,7 @@ const PostDetail = () => {
     const divRefs = useRef([]); // contenteditableの参照を保持する配列
     const titleRef = useRef(null); // title要素のrefを作成
     const [selectedElementIndex, setSelectedElementIndex] = useState(-1);
-
+    
     // パスパラメータからidを取得
     const router = useRouter()
     const param_id = router.query.id
@@ -141,23 +142,22 @@ const PostDetail = () => {
     }
     // 削除ボタンクリック
     const onDClick = async (e) => {
-        /*
         try {
             if (id) {
-                // テーブルA（Post）の削除
-                await DataStore.delete(Post, c => c.id("eq", id))
-
                 // テーブルB（PostList）の削除
-                await DataStore.delete(PostList, c => c.postListPostId("eq", id))
+                await DataStore.delete(PostList, (post_list) => post_list.post_id.eq(id))
+                
+                // テーブルA（Post）の削除
+                await DataStore.delete(Post, id)
 
                 console.log("削除が完了しました")
+                // TODO:リスト一覧にリダイレクト
             } else {
                 console.log("記事が見つかりません")
             }
         } catch (error) {
             console.error('削除時にエラーが発生しました:', error);
         }
-        */
     }
 
     // 「段落の追加」クリック時
@@ -219,7 +219,7 @@ const PostDetail = () => {
             })
         }
     }
-    
+
     return (
         <Authenticator.Provider>
         <HeaderAdmin />
@@ -240,18 +240,39 @@ const PostDetail = () => {
                     }}
                 >
                     <Button variation="link" size="small"><Link href="/admin/postlist">一覧に戻る</Link></Button>
-                    <Button variation="warning" onClick={onUClick} size="small">更新する</Button>
+                    {
+                        post ?
+                        <Button variation="warning" onClick={onUClick} size="small">更新する</Button>
+                        :
+                        ''
+                    }
                 </Flex>
                 
+                <RadioGroupField
+                    label="記事のタイプ"
+                    name="article_type"
+                    direction="row"
+                    style={{ marginBottom: '20px' }}
+                >
+                    <Radio value="basic">基本タイプ</Radio>
+                    <Radio value="link">リンクタイプ</Radio>
+                </RadioGroupField>
                 <Card>
                     <Flex direction="column" alignItems="flex-start" className="ProseMirror note-common-styles__textnote-body">
-                        <h1
-                            contentEditable
-                            style={{ border: 'none', outline: 'none', lineHeight: '1.5', width: "640px" }}
-                            dangerouslySetInnerHTML={{ __html: post.title ? post.title : '' }}
-                            ref={titleRef} // refをtitle要素に紐付け
-                            onKeyDown={handleKeyDownH1} // Enterキーの処理を行う
-                        />
+                        {
+                            post ?
+                            <h1
+                                contentEditable
+                                style={{ border: 'none', outline: 'none', lineHeight: '1.5', width: "640px" }}
+                                dangerouslySetInnerHTML={{ __html: post && post.title ? post.title : '' }}
+                                ref={titleRef} // refをtitle要素に紐付け
+                                onKeyDown={handleKeyDownH1} // Enterキーの処理を行う
+                                placeholder="記事タイトル"
+                                className={styles.editableContent}
+                            />
+                            :
+                            '記事が見つかりませんでした。'
+                        }
                         {
                             post_list.length > 0 ?
                             post_list.map((postItem, index) => {
@@ -269,8 +290,18 @@ const PostDetail = () => {
                                                 onClick={() => setSelectedElementIndex(index) }
                                             />
                                             <Flex>
-                                                {index > 0 && <button className="amplify-button amplify-field-group__control amplify-button--default amplify-button--small" onClick={() => handleMoveUp(index)}>↑</button>}
-                                                {index < post_list.length - 1 && <button className="amplify-button amplify-field-group__control amplify-button--default amplify-button--small" onClick={() => handleMoveDown(index)}>↓</button>}
+                                                {
+                                                    index > 0 ?
+                                                    <button onClick={() => handleMoveUp(index)} className="amplify-button amplify-field-group__control amplify-button--default amplify-button--small">↑</button>
+                                                    :
+                                                    <button isDisabled={true} className="amplify-button amplify-field-group__control amplify-button--default amplify-button--small amplify-button--disabled">↑</button>
+                                                }
+                                                {
+                                                    index < post_list.length - 1 ?
+                                                    <button onClick={() => handleMoveDown(index)} className="amplify-button amplify-field-group__control amplify-button--default amplify-button--small">↓</button>
+                                                    :
+                                                    <button isDisabled={true} className="amplify-button amplify-field-group__control amplify-button--default amplify-button--small amplify-button--disabled">↓</button>
+                                                }
                                             </Flex>
                                         </Flex>
                                     )
@@ -286,24 +317,44 @@ const PostDetail = () => {
                                                 onKeyDown={e => handleKeyDown(e, index)}
                                             />
                                             <Flex>
-                                                {index > 0 && <button className="amplify-button amplify-field-group__control amplify-button--default amplify-button--small" onClick={() => handleMoveUp(index)}>↑</button>}
-                                                {index < post_list.length - 1 && <button className="amplify-button amplify-field-group__control amplify-button--default amplify-button--small" onClick={() => handleMoveDown(index)}>↓</button>}
+                                                {
+                                                    index > 0 ?
+                                                    <button onClick={() => handleMoveUp(index)} className="amplify-button amplify-field-group__control amplify-button--default amplify-button--small">↑</button>
+                                                    :
+                                                    <button isDisabled={true} className="amplify-button amplify-field-group__control amplify-button--default amplify-button--small amplify-button--disabled">↑</button>
+                                                }
+                                                {
+                                                    index < post_list.length - 1 ?
+                                                    <button onClick={() => handleMoveDown(index)} className="amplify-button amplify-field-group__control amplify-button--default amplify-button--small">↓</button>
+                                                    :
+                                                    <button isDisabled={true} className="amplify-button amplify-field-group__control amplify-button--default amplify-button--small amplify-button--disabled">↓</button>
+                                                }
                                             </Flex>
                                         </Flex>
                                     )
                                 }
                             })
                             :
-                            <Loader />
+                            ''
                         }
-                        <Flex direction="row">
-                            <Button variation="default" onClick={handleAddDiv} size="small">段落の追加</Button>
-                            <Button variation="default" onClick={handleAddH2} size="small">h2大見出しの追加</Button>
+                         {
+                            post ?
+                            <Flex direction="row">
+                                <Button variation="default" onClick={handleAddDiv} size="small">段落の追加</Button>
+                                <Button variation="default" onClick={handleAddH2} size="small">h2大見出しの追加</Button>
+                            </Flex>
+                            :
+                            ''
+                         }
+                    </Flex>
+                    {
+                        post ?
+                        <Flex justifyContent="flex-end">
+                            <Link href="#" onClick={onDClick}>削除する</Link>
                         </Flex>
-                    </Flex>
-                    <Flex justifyContent="flex-end">
-                        <Link href="#" onClick={onDClick}>削除する</Link>
-                    </Flex>
+                        :
+                        ''
+                    }
                 </Card>
             </View>
         </>

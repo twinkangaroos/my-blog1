@@ -1,0 +1,12 @@
+.editableContent {
+    /* 既存のスタイル... */
+    position: relative;
+}
+.editableContent[contenteditable="true"]:empty:before {
+    content: attr(placeholder);
+    color: gray; /* グレーの文字色 */
+    position: absolute;
+    pointer-events: none;
+    left: 0;
+    top: 0;
+}

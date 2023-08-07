@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
+import "../../styles/editable.module.css"
 
 const Test = () => {
     const inputEls = useRef([]); // テキストボックスの参照を保持する配列
@@ -50,6 +51,16 @@ const Test = () => {
     return (
         <>
             <h1>テキストエリア動的追加</h1>
+            <div className="release__content" contentEditable autofocus>sss</div>
+            <h2
+                className='sss'
+                contentEditable
+                autofocus
+                style={{ outline: 'none', width: "640px" }}
+                placeholder="記事タイトル" 
+                dangerouslySetInnerHTML={{ __html: 'h２です。' }}
+            />
+            
             <div>
                 {
                     names.map((name, index) => (
