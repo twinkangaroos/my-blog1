@@ -55,7 +55,7 @@ const PostComponent = () => {
                     <Flex direction="column" alignItems="flex-start" className="ProseMirror note-common-styles__textnote-body">
                         <h1
                             style={{ border: 'none', outline: 'none', lineHeight: '1.5', width: "640px" }}
-                            dangerouslySetInnerHTML={{ __html: post.title ? post.title : '' }}
+                            dangerouslySetInnerHTML={{ __html: post && post.title ? post.title : '' }}
                         />
                         {
                             post_list.length > 0 ?
