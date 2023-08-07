@@ -1,12 +1,19 @@
-.editableContent {
+.editableContentH1 {
     /* 既存のスタイル... */
     position: relative;
 }
-.editableContent[contenteditable="true"]:empty:before {
+.editableContentH1[contenteditable="true"]:empty:before {
     content: attr(placeholder);
     color: gray; /* グレーの文字色 */
     position: absolute;
     pointer-events: none;
     left: 0;
     top: 0;
+}
+
+.editableContent {
+    border: 'none';
+    outline: 'none';
+    line-height: '1.5';
+    width: "640px"
 }

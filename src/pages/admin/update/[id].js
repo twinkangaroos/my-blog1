@@ -160,16 +160,10 @@ const PostDetail = () => {
         }
     }
 
-    // 「段落の追加」クリック時
-    const handleAddDiv = () => {
+    // 「段落（div）・h2大見出し（h2）・h3小見出し（h3）の追加」クリック時
+    const handleAddElement = (tag_type) => {
         //setPostListContents([...post_list_contents, ''])
-        setPostList((prevList) => [...prevList, new PostList({ content: '', type: 'div' })]); // post_listにも要素を追加
-        setFocusOnNextAdd(true); // フォーカスを当てるフラグをtrueに設定
-    }
-    // 「h2大見出しの追加」クリック時
-    const handleAddH2 = () => {
-        //setPostListContents([...post_list_contents, ''])
-        setPostList((prevList) => [...prevList, new PostList({ content: '', type: 'h2' })]); // post_listにも要素を追加
+        setPostList((prevList) => [...prevList, new PostList({ content: '', type: tag_type })]); // post_listにも要素を追加
         setFocusOnNextAdd(true); // フォーカスを当てるフラグをtrueに設定
     }
     
@@ -268,15 +262,39 @@ const PostDetail = () => {
                                 ref={titleRef} // refをtitle要素に紐付け
                                 onKeyDown={handleKeyDownH1} // Enterキーの処理を行う
                                 placeholder="記事タイトル"
-                                className={styles.editableContent}
+                                className={styles.editableContentH1}
                             />
                             :
-                            '記事が見つかりませんでした。'
+                            ''
                         }
                         {
                             post_list.length > 0 ?
                             post_list.map((postItem, index) => {
                                 const { type, content } = postItem
+                                // 上に移動ボタン
+                                const renderUpElement = (index) => {
+                                    if (index > 0) {
+                                        return (
+                                            <Button onClick={() => handleMoveUp(index)} className="amplify-button amplify-field-group__control amplify-button--default amplify-button--small">↑</Button>
+                                        )
+                                    } else {
+                                        return (
+                                            <Button isDisabled={true} className="amplify-button amplify-field-group__control amplify-button--default amplify-button--small amplify-button--disabled">↑</Button>
+                                        )
+                                    }
+                                }
+                                // 下に移動ボタン
+                                const renderDownElement = (index) => {
+                                    if (index < post_list.length - 1) {
+                                        return (
+                                            <Button onClick={() => handleMoveDown(index)} className="amplify-button amplify-field-group__control amplify-button--default amplify-button--small">↓</Button>
+                                        )
+                                    } else {
+                                        return (
+                                            <Button isDisabled={true} className="amplify-button amplify-field-group__control amplify-button--default amplify-button--small amplify-button--disabled">↓</Button>
+                                        )
+                                    }
+                                }
                                 if (type === "div") {
                                     return (
                                         <Flex key={index + "_head"}>
@@ -287,21 +305,11 @@ const PostDetail = () => {
                                                 dangerouslySetInnerHTML={{ __html: content ? content.replace(/\n/g, '<br />') : '' }}
                                                 ref={el => (divRefs.current[index] = el)}
                                                 onKeyDown={e => handleKeyDown(e, index)}
-                                                onClick={() => setSelectedElementIndex(index) }
+                                                onClick={() => setSelectedElementIndex(index)}
                                             />
                                             <Flex>
-                                                {
-                                                    index > 0 ?
-                                                    <button onClick={() => handleMoveUp(index)} className="amplify-button amplify-field-group__control amplify-button--default amplify-button--small">↑</button>
-                                                    :
-                                                    <button isDisabled={true} className="amplify-button amplify-field-group__control amplify-button--default amplify-button--small amplify-button--disabled">↑</button>
-                                                }
-                                                {
-                                                    index < post_list.length - 1 ?
-                                                    <button onClick={() => handleMoveDown(index)} className="amplify-button amplify-field-group__control amplify-button--default amplify-button--small">↓</button>
-                                                    :
-                                                    <button isDisabled={true} className="amplify-button amplify-field-group__control amplify-button--default amplify-button--small amplify-button--disabled">↓</button>
-                                                }
+                                                {renderUpElement(index)}
+                                                {renderDownElement(index)}
                                             </Flex>
                                         </Flex>
                                     )
@@ -317,18 +325,25 @@ const PostDetail = () => {
                                                 onKeyDown={e => handleKeyDown(e, index)}
                                             />
                                             <Flex>
-                                                {
-                                                    index > 0 ?
-                                                    <button onClick={() => handleMoveUp(index)} className="amplify-button amplify-field-group__control amplify-button--default amplify-button--small">↑</button>
-                                                    :
-                                                    <button isDisabled={true} className="amplify-button amplify-field-group__control amplify-button--default amplify-button--small amplify-button--disabled">↑</button>
-                                                }
-                                                {
-                                                    index < post_list.length - 1 ?
-                                                    <button onClick={() => handleMoveDown(index)} className="amplify-button amplify-field-group__control amplify-button--default amplify-button--small">↓</button>
-                                                    :
-                                                    <button isDisabled={true} className="amplify-button amplify-field-group__control amplify-button--default amplify-button--small amplify-button--disabled">↓</button>
-                                                }
+                                                {renderUpElement(index)}
+                                                {renderDownElement(index)}
+                                            </Flex>
+                                        </Flex>
+                                    )
+                                } else if (type === "h3") {
+                                    return (
+                                        <Flex key={index + "_head"}>
+                                            <h3
+                                                key={index}
+                                                contentEditable
+                                                style={{ border: 'none', outline: 'none', lineHeight: '1.5', width: "640px"  }}
+                                                dangerouslySetInnerHTML={{ __html: content ? content.replace(/\n/g, '<br />') : '' }}
+                                                ref={el => (divRefs.current[index] = el)}
+                                                onKeyDown={e => handleKeyDown(e, index)}
+                                            />
+                                            <Flex>
+                                                {renderUpElement(index)}
+                                                {renderDownElement(index)}
                                             </Flex>
                                         </Flex>
                                     )
@@ -340,8 +355,9 @@ const PostDetail = () => {
                          {
                             post ?
                             <Flex direction="row">
-                                <Button variation="default" onClick={handleAddDiv} size="small">段落の追加</Button>
-                                <Button variation="default" onClick={handleAddH2} size="small">h2大見出しの追加</Button>
+                                <Button variation="default" onClick={() => handleAddElement("div")} size="small">段落の追加</Button>
+                                <Button variation="default" onClick={() => handleAddElement("h2")} size="small">h2大見出しの追加</Button>
+                                <Button variation="default" onClick={() => handleAddElement("h3")} size="small">h3小見出しの追加</Button>
                             </Flex>
                             :
                             ''
