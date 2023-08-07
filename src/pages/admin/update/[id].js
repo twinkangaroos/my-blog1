@@ -18,7 +18,8 @@ const PostDetail = () => {
     const divRefs = useRef([]); // contenteditableの参照を保持する配列
     const titleRef = useRef(null); // title要素のrefを作成
     const [selectedElementIndex, setSelectedElementIndex] = useState(-1);
-    
+    const [contents, setContents] = useState(['']); // 各要素のvalueを保持する配列（移動時に必要。Modelは書き込み不可のため）
+
     // パスパラメータからidを取得
     const router = useRouter()
     const param_id = router.query.id
@@ -56,6 +57,9 @@ const PostDetail = () => {
                     // Model形式で保持（例：[0]Model {id: '', ..} [1]Model {id: '', ..}）
                     setPostList(post_list_result)
                     setPostListFlag(true)
+                    // DBのpost_listをテキストで保持
+                    const updatedContents = post_list_result.map(item => item.content)
+                    setContents(updatedContents)
                     console.log("Success in taking PostList.")
                 }
             } else {
@@ -160,14 +164,14 @@ const PostDetail = () => {
         }
     }
 
-    // 「段落（div）・h2大見出し（h2）・h3小見出し（h3）の追加」クリック時
+    // 要素追加時（段落（div）・h2大見出し（h2）・h3小見出し（h3））
     const handleAddElement = (tag_type) => {
-        //setPostListContents([...post_list_contents, ''])
-        setPostList((prevList) => [...prevList, new PostList({ content: '', type: tag_type })]); // post_listにも要素を追加
+        setPostList((prevList) => [...prevList, new PostList({ content: '', type: tag_type })]); // post_listに要素を追加
+        setContents([...contents, ''])
         setFocusOnNextAdd(true); // フォーカスを当てるフラグをtrueに設定
     }
     
-    // タイトルは改行禁止
+    // h1タイトル入力時、エンターキーを無効化
     const handleKeyDownH1 = (e) => {
         if (e.key === 'Enter') {
             e.preventDefault(); // Enterキーのデフォルトの改行処理を防ぐ
@@ -178,9 +182,11 @@ const PostDetail = () => {
     const handleKeyDown = (e, index) => {
         if (e.key === 'Backspace') {
             const el = divRefs.current[index];
+            // バックスペースキーが押されたときに内容が空なら要素を削除
             if (el.innerText === '') {
-                // バックスペースキーが押されたときに内容が空なら要素を削除
                 setPostList(prevList => prevList.filter((_, i) => i !== index));
+                // contentsの要素も削除
+                setContents(prevContents => prevContents.filter((_, i) => i !== index));
             }
         }
     }
@@ -188,29 +194,34 @@ const PostDetail = () => {
     // 「上に移動」ボタンのクリック時（例：index=5 → 4）
     const handleMoveUp = (index) => {
         if (index > 0) {
-            console.log("post_list", post_list)
-            // 要素をコピーして新しい配列を作成
+            // Model要素をコピーして新しい配列を作成
             const updatedList = [...post_list];
             [updatedList[index - 1], updatedList[index]] = [updatedList[index], updatedList[index - 1]];
-            setPostList(updatedList); // stateの更新
-            console.log("updatedList", updatedList)
-            //setPostList(prevList => {
-            //    const list = [...prevList];
-            //    console.log("list", list)
-            //    [list[index - 1], list[index]] = [list[index], list[index - 1]];
-            //    return list;
-            //})
+            setPostList(updatedList);
+            
+            // 表示要素も同様に
+            const updatedContents = [...contents];
+            // 入力中の文字列を反映
+            updatedContents[index] = divRefs.current[index].innerText;
+            [updatedContents[index - 1], updatedContents[index]] = [updatedContents[index], updatedContents[index - 1]];
+            setContents(updatedContents);
         }
     }
 
     // 「下に移動」ボタンのクリック時
     const handleMoveDown = (index) => {
         if (index < post_list.length - 1) {
-            setPostList(prevList => {
-                const list = [...prevList];
-                [list[index], list[index + 1]] = [list[index + 1], list[index]];
-                return list;
-            })
+            // Model要素をコピーして新しい配列を作成
+            const updatedList = [...post_list];
+            [updatedList[index], updatedList[index + 1]] = [updatedList[index + 1], updatedList[index]];
+            setPostList(updatedList);
+            
+            // 表示要素も同様に
+            const updatedContents = [...contents];
+            // 入力中の文字列を反映
+            updatedContents[index] = divRefs.current[index].innerText;
+            [updatedContents[index], updatedContents[index + 1]] = [updatedContents[index + 1], updatedContents[index]];
+            setContents(updatedContents);
         }
     }
 
@@ -270,7 +281,6 @@ const PostDetail = () => {
                         {
                             post_list.length > 0 ?
                             post_list.map((postItem, index) => {
-                                const { type, content } = postItem
                                 // 上に移動ボタン
                                 const renderUpElement = (index) => {
                                     if (index > 0) {
@@ -295,17 +305,17 @@ const PostDetail = () => {
                                         )
                                     }
                                 }
-                                if (type === "div") {
+                                if (postItem.type === "div") {
                                     return (
                                         <Flex key={index + "_head"}>
                                             <div
                                                 key={index}
                                                 contentEditable
                                                 style={{ border: 'none', outline: 'none', lineHeight: '1.5', width: "640px"  }}
-                                                dangerouslySetInnerHTML={{ __html: content ? content.replace(/\n/g, '<br />') : '' }}
+                                                dangerouslySetInnerHTML={{ __html: contents[index] ? contents[index].replace(/\n/g, '<br />') : '' }}
                                                 ref={el => (divRefs.current[index] = el)}
                                                 onKeyDown={e => handleKeyDown(e, index)}
-                                                onClick={() => setSelectedElementIndex(index)}
+                                                //onClick={() => setSelectedElementIndex(index)}
                                             />
                                             <Flex>
                                                 {renderUpElement(index)}
@@ -313,14 +323,14 @@ const PostDetail = () => {
                                             </Flex>
                                         </Flex>
                                     )
-                                } else if (type === "h2") {
+                                } else if (postItem.type === "h2") {
                                     return (
                                         <Flex key={index + "_head"}>
                                             <h2
                                                 key={index}
                                                 contentEditable
                                                 style={{ border: 'none', outline: 'none', lineHeight: '1.5', width: "640px"  }}
-                                                dangerouslySetInnerHTML={{ __html: content ? content.replace(/\n/g, '<br />') : '' }}
+                                                dangerouslySetInnerHTML={{ __html: contents[index] ? contents[index].replace(/\n/g, '<br />') : '' }}
                                                 ref={el => (divRefs.current[index] = el)}
                                                 onKeyDown={e => handleKeyDown(e, index)}
                                             />
@@ -330,14 +340,14 @@ const PostDetail = () => {
                                             </Flex>
                                         </Flex>
                                     )
-                                } else if (type === "h3") {
+                                } else if (postItem.type === "h3") {
                                     return (
                                         <Flex key={index + "_head"}>
                                             <h3
                                                 key={index}
                                                 contentEditable
                                                 style={{ border: 'none', outline: 'none', lineHeight: '1.5', width: "640px"  }}
-                                                dangerouslySetInnerHTML={{ __html: content ? content.replace(/\n/g, '<br />') : '' }}
+                                                dangerouslySetInnerHTML={{ __html: contents[index] ? contents[index].replace(/\n/g, '<br />') : '' }}
                                                 ref={el => (divRefs.current[index] = el)}
                                                 onKeyDown={e => handleKeyDown(e, index)}
                                             />
