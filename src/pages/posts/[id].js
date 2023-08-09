@@ -81,6 +81,16 @@ const PostComponent = () => {
                                             />
                                         </Flex>
                                     )
+                                } else if (type === "h3") {
+                                    return (
+                                        <Flex key={index + "_head"}>
+                                            <h3
+                                                key={index}
+                                                style={{ border: 'none', outline: 'none', lineHeight: '1.5', width: "640px"  }}
+                                                dangerouslySetInnerHTML={{ __html: content ? content.replace(/\n/g, '<br />') : '' }}
+                                            />
+                                        </Flex>
+                                    )
                                 }
                             })
                             :
