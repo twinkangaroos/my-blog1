@@ -13,7 +13,7 @@ const PostDetail = () => {
     const [post, setPost] = useState("")
     const [post_list, setPostList] = useState([])
     const [id, setId] = useState("")
-    const [post_list_flag, setPostListFlag] = useState(false)
+    //const [post_list_flag, setPostListFlag] = useState(false)
     const [focusOnNextAdd, setFocusOnNextAdd] = useState(true); // 要素追加時にフォーカスを当てるかのフラグ
     const divRefs = useRef([]); // contenteditableの参照を保持する配列
     const titleRef = useRef(null); // title要素のrefを作成
@@ -28,14 +28,17 @@ const PostDetail = () => {
     // 初期ロード時の処理
     useEffect(() => {
         doInit()
-    }, [param_id, post_list_flag])
+    //}, [param_id, post_list_flag])
+    }, [param_id])
 
     // 要素追加時
     useEffect(() => {
         if (focusOnNextAdd && divRefs.current.length > 0) {
             // 新しく追加された要素にフォーカスを当てる
-            divRefs.current[divRefs.current.length - 1].focus()
-            setFocusOnNextAdd(false) // フォーカスを当てるフラグをfalseに設定
+            if (divRefs.current[divRefs.current.length - 1]) {
+                divRefs.current[divRefs.current.length - 1].focus()
+                setFocusOnNextAdd(false) // フォーカスを当てるフラグをfalseに設定
+            }
         }
     }, [focusOnNextAdd, post_list])
     
@@ -47,7 +50,7 @@ const PostDetail = () => {
             const post_result = await DataStore.query(Post, (c) => c.id.eq(param_id))
             if (post_result && post_result.length > 0) {
                 setPost(post_result[0])
-                console.log("Success in taking Post.")
+                console.log("First success in taking Post.", post_result[0])
 
                 // PostList取得
                 const post_list_result = await DataStore.query(PostList, (c) => c.post_id.eq(param_id), {
@@ -56,11 +59,12 @@ const PostDetail = () => {
                 if (post_list_result && post_list_result.length > 0) {
                     // Model形式で保持（例：[0]Model {id: '', ..} [1]Model {id: '', ..}）
                     setPostList(post_list_result)
-                    setPostListFlag(true)
+                    // PostList取得後、初期ロード実行？意味不明なのでとりあえずコメントしておく。
+                    //setPostListFlag(true)
                     // DBのpost_listをテキストで保持
                     const updatedContents = post_list_result.map(item => item.content)
                     setContents(updatedContents)
-                    console.log("Success in taking PostList.")
+                    console.log("First success in taking PostList.")
                 }
             } else {
                 console.log("Error when retrieving DB during doInit().....")
@@ -73,30 +77,41 @@ const PostDetail = () => {
         e.preventDefault()
         try {
             if (id) {
-                if (titleRef.current) {
-                    const updatedTitle = titleRef.current.innerText
-                    console.log("title=",updatedTitle)
-                    const currentDate = new Date()
-                    // AWSDate 形式に変換
-                    const awsDate = currentDate.toISOString().split('T')[0]; // 'YYYY-MM-DD' 形式に変換
-
+                if (!titleRef.current.innerText) {
+                    alert("タイトルを入力してください")
+                    return
+                }
+                const updatedTitle = titleRef.current.innerText
+                const currentDate = new Date() // 2023-08-09T09:02:09.955Z
+                // AWSDate 形式に変換
+                const awsDate = currentDate.toISOString().split('T')[0]
+                
+                // Post再取得
+                const current_post = await DataStore.query(Post, (c) => c.id.eq(id))
+                if (current_post && current_post.length > 0) {
+                    console.log("Success in taking Post immediately.", current_post[0])
+                    
                     // Postの更新
-                    await DataStore.save(
+                    const updatedPost = await DataStore.save(
                         Post.copyOf(
-                            post, 
+                            current_post[0], 
                             updated => {
                                 updated.title = updatedTitle
                                 updated.show_date = awsDate
                             }
                         )
                     )
-                    console.log("Post successfully updated.") 
+                    console.log("Post successfully updated.")
+                } else {
+                    console.log("Error when retrieving Post before Updated.....")
+                    return
                 }
                 
                 // PostListの全削除（※post_idで一括削除するとトランザクションがおかしくなる？）
                 await DataStore.delete(PostList, (post_list) => post_list.post_id.eq(id))
                 console.log("All PostList successfully deleted.")
-
+                
+                // PostListの再作成
                 if (post_list && post_list.length > 0) {
                     // TODO: contentsを利用すればよいはず？
                     // contenteditableの内容を取得（※追加したてのnullの考慮要）
@@ -123,29 +138,35 @@ const PostDetail = () => {
                     console.log("All PostList successfully created.")
                 }
                 
-                // Post再取得
-                const post_result = await DataStore.query(Post, (c) => c.id.eq(id))
-                if (post_result && post_result.length > 0) {
-                    setPost(post_result[0])
-                    console.log("Success in taking PostList again.")
+                // Post再取得（※Postはこの時点で取得してもうまくいかない模様）
+                const p_result = await DataStore.query(Post, (c) => c.id.eq(id))
+                if (p_result && p_result.length > 0) {
+                    setPost(p_result[0])
+                    console.log("Success in taking Post again.", p_result[0])
+                } else {
+                    console.log("Error when retrieving Post after Updated.....")
+                    return
                 }
                 // PostList再取得
-                const post_list_result = await DataStore.query(PostList, (c) => c.post_id.eq(param_id), {
+                const post_list_result = await DataStore.query(PostList, (c) => c.post_id.eq(id), {
                     sort:(s) => s.sort(SortDirection.ASCENDING),
                 })
+                
                 if (post_list_result && post_list_result.length > 0) {
                     setPostList(post_list_result)
                     console.log("Success in taking PostList again.")
                 }
                 alert("更新完了しました。")
             } else {
-                console.log("記事が見つかりません");
+                console.log("記事が見つかりません")
+                return
             }
         }
         catch (error) {
             console.error('更新時にエラーが発生しました:', error);
         }
     }
+
     // 削除ボタンクリック
     const onDClick = async (e) => {
         try {
@@ -161,6 +182,7 @@ const PostDetail = () => {
                 router.push(`/admin/postlist`)
             } else {
                 console.log("記事が見つかりません")
+                return
             }
         } catch (error) {
             console.error('削除時にエラーが発生しました:', error);

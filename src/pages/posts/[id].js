@@ -3,8 +3,9 @@ import { useRouter } from 'next/router'
 import { DataStore, SortDirection } from '@aws-amplify/datastore';
 import { Post, PostList } from '../../models';
 import { useState, useEffect } from 'react';
-import { Card, View, Flex, useTheme, Loader } from '@aws-amplify/ui-react';
+import { Card, View, Flex, useTheme, Button, TextAreaField, Badge, Heading, Text, Icon } from '@aws-amplify/ui-react';
 import Header from "../Header"
+import Markdown from 'react-markdown'
 
 const PostComponent = () => {
     const [post, setPost] = useState("")
@@ -19,6 +20,13 @@ const PostComponent = () => {
     // 初期ロード時の処理
     useEffect(() => {
         doInit()
+        // real time functionality
+        DataStore.observe(Post).subscribe(()  => {
+            doInit()
+        })
+        DataStore.observe(PostList).subscribe(()  => {
+            doInit()
+        })
     }, [param_id])
 
     async function doInit() {
@@ -68,6 +76,7 @@ const PostComponent = () => {
                                                 key={index}
                                                 style={{ border: 'none', outline: 'none', lineHeight: '1.5', width: "640px"  }}
                                                 dangerouslySetInnerHTML={{ __html: content ? content.replace(/\n/g, '<br />') : '' }}
+                                                Markdown
                                             />
                                         </Flex>
                                     )
@@ -94,8 +103,81 @@ const PostComponent = () => {
                                 }
                             })
                             :
-                            <Loader />
+                            ''
                         }
+                        
+                    </Flex>
+                    <Flex justifyContent="center">
+                        <Button 
+                            variation="default" 
+                            size="Large" 
+                            isFullWidth={true}
+                            style={{ width: '100px', marginTop: '20px', borderColor: 'red' }}
+                        >
+                            <Icon
+                                ariaLabel="Favorite"
+                                viewBox={{ width: 24, height: 24 }}
+                                pathData="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0
+                                3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"
+                            />
+                            いいね
+                        </Button>
+                    </Flex>
+
+                    <h3>この記事にコメントをする</h3>
+                    <TextAreaField 
+                        //ref={(el) => (inputEls.current[index] = el)}
+                        //value={pl.content}
+                        //onChange={(e) => handleOnChange(e, index)}
+                        rows="5"
+                        width="100%"
+                        //style={{ border: 'none', outline: 'none', lineHeight: '1.5' }} // 枠線をゼロにするCSSスタイルを適用
+                        //resize="vertical"
+                    />
+                    <Flex justifyContent="center" style={{ marginBottom: '40px' }}>
+                        <Button 
+                            variation="primary" 
+                            size="Large" 
+                            isFullWidth={true}
+                            style={{  width: '200px', marginTop: '20px', backgroundColor: 'red' }}
+                        >確認画面へ</Button>
+                    </Flex>
+
+                    <h2>この記事に関するみなさんからのコメント</h2>
+                    <Flex>
+                        <Card variation="outlined" style={{ borderColor: 'lightgray' }}>
+                            <Flex
+                                direction="column"
+                                gap={tokens.space.xs}
+                            >
+                                <Flex alignItems="flex-start">
+                                    <Badge size="small" variation="info">
+                                        こぐま
+                                    </Badge>
+                                    <Badge size="small" variation="success">
+                                        2023.08.09 21:32
+                                    </Badge>
+                                </Flex>
+                                <Text as="span">
+                                    ちょっとしたお土産には、ビッグサイズの果物の形のお饅頭か、夏場や甘党でない人にはカレー味の煎餅が定番です
+                                </Text>
+                                <Flex 
+                                    direction="row" 
+                                    justifyContent="flex-end"
+                                    alignItems="center"
+                                >
+                                    <Button variation="default" size="small" >返信</Button>
+                                    <Icon
+                                        ariaLabel="Favorite"
+                                        viewBox={{ width: 24, height: 24 }}
+                                        pathData="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0
+                                        3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"
+                                    />
+                                    3
+                                </Flex>
+                            </Flex>
+                            
+                        </Card>
                     </Flex>
                 </Card>
             </View>

@@ -19,12 +19,6 @@
     color: var(--color-text-primary);
     pointer-events: auto;
 }
-/*
-.note-common-styles__textnote-body h2 {
-    margin-top: 54px;
-    font-size: var(--font-size-2xl);
-}
-*/
 .note-common-styles__textnote-body p, .note-common-styles__textnote-body ul li {
     font-size: var(--font-size-lg);
     line-height: 2.25rem;
