@@ -16,6 +16,10 @@ const PostList = () => {
     // 初期ロード時の処理
     useEffect(() => {
         doInit()
+        // real time functionality
+        DataStore.observe(Post).subscribe(()  => {
+            doInit()
+        })
     }, [])
 
     // 初期処理
@@ -34,12 +38,15 @@ const PostList = () => {
 
     // 記事作成ボタンクリックで画面遷移
     const createButtonClick = (p_id) => {
-        router.push(`/admin/create`)
+        router.push(`/admin/create_post`)
     }
 
     // 日付を成形する関数
     const extractDateAndTimeChars = (dateString) => {
-        return dateString.substring(0, 10) + " " + dateString.substring(11, 19)
+        if (dateString) {
+            return dateString.substring(0, 10) + " " + dateString.substring(11, 19)
+        }
+        return ""
     }
 
     return (
