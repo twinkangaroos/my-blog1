@@ -93,17 +93,19 @@ const PostDetail = () => {
                     console.log("Post successfully updated.") 
                 }
                 
-                 // PostListの全削除
-                 await DataStore.delete(PostList, (post_list) => post_list.post_id.eq(id))
-                 console.log("All PostList successfully deleted.")
+                // PostListの全削除（※post_idで一括削除するとトランザクションがおかしくなる？）
+                await DataStore.delete(PostList, (post_list) => post_list.post_id.eq(id))
+                console.log("All PostList successfully deleted.")
 
                 if (post_list && post_list.length > 0) {
+                    // TODO: contentsを利用すればよいはず？
                     // contenteditableの内容を取得（※追加したてのnullの考慮要）
                     const updatedContent = post_list.map((pl, index) => {
                         const el = divRefs.current[index];
                         return el ? el.innerText : '';
                     })
                     
+                    // TODO: 段落が多くなれば途中で処理が切れてしまう？
                     // PostListの再作成
                     let i = 0
                     for (const pl of post_list) {
