@@ -54,7 +54,7 @@ const PostComponent = () => {
             console.log("observe LikeComment")
             getCommentLike()
         })
-    }, [param_id])
+    }, [])
 
     // 初期処理
     async function doInit() {
