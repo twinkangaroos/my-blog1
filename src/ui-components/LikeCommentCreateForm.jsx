@@ -6,7 +6,13 @@
 
 /* eslint-disable */
 import * as React from "react";
-import { Button, Flex, Grid, TextField } from "@aws-amplify/ui-react";
+import {
+  Button,
+  Flex,
+  Grid,
+  SwitchField,
+  TextField,
+} from "@aws-amplify/ui-react";
 import { getOverrideProps } from "@aws-amplify/ui-react/internal";
 import { LikeComment } from "../models";
 import { fetchByPath, validateField } from "./utils";
@@ -25,7 +31,7 @@ export default function LikeCommentCreateForm(props) {
   const initialValues = {
     comment_id: "",
     user_id: "",
-    like_flag: "",
+    like_flag: false,
     post_id: "",
   };
   const [comment_id, setComment_id] = React.useState(initialValues.comment_id);
@@ -174,13 +180,13 @@ export default function LikeCommentCreateForm(props) {
         hasError={errors.user_id?.hasError}
         {...getOverrideProps(overrides, "user_id")}
       ></TextField>
-      <TextField
+      <SwitchField
         label="Like flag"
-        isRequired={false}
-        isReadOnly={false}
-        value={like_flag}
+        defaultChecked={false}
+        isDisabled={false}
+        isChecked={like_flag}
         onChange={(e) => {
-          let { value } = e.target;
+          let value = e.target.checked;
           if (onChange) {
             const modelFields = {
               comment_id,
@@ -200,7 +206,7 @@ export default function LikeCommentCreateForm(props) {
         errorMessage={errors.like_flag?.errorMessage}
         hasError={errors.like_flag?.hasError}
         {...getOverrideProps(overrides, "like_flag")}
-      ></TextField>
+      ></SwitchField>
       <TextField
         label="Post id"
         isRequired={false}

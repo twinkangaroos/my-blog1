@@ -2,7 +2,7 @@ type LikeComment @model @auth(rules: [{allow: public}]) {
   id: ID!
   comment_id: String
   user_id: String
-  like_flag: String
+  like_flag: Boolean
   post_id: String
 }
 

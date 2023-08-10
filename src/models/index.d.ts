@@ -14,7 +14,7 @@ type EagerLikeComment = {
   readonly id: string;
   readonly comment_id?: string | null;
   readonly user_id?: string | null;
-  readonly like_flag?: string | null;
+  readonly like_flag?: boolean | null;
   readonly post_id?: string | null;
   readonly createdAt?: string | null;
   readonly updatedAt?: string | null;
@@ -28,7 +28,7 @@ type LazyLikeComment = {
   readonly id: string;
   readonly comment_id?: string | null;
   readonly user_id?: string | null;
-  readonly like_flag?: string | null;
+  readonly like_flag?: boolean | null;
   readonly post_id?: string | null;
   readonly createdAt?: string | null;
   readonly updatedAt?: string | null;

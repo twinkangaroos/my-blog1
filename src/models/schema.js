@@ -27,7 +27,7 @@ export const schema = {
                 "like_flag": {
                     "name": "like_flag",
                     "isArray": false,
-                    "type": "String",
+                    "type": "Boolean",
                     "isRequired": false,
                     "attributes": []
                 },
@@ -543,5 +543,5 @@ export const schema = {
     "enums": {},
     "nonModels": {},
     "codegenVersion": "3.3.5",
-    "version": "eb665080b1cf28366870beb62e3df04a"
+    "version": "1077c8367b0a5ea06a6bd38e72d2ff18"
 };

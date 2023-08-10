@@ -6,7 +6,7 @@ import { useState, useEffect, use } from 'react';
 import { Card, View, Flex, useTheme, Button, TextAreaField, Badge, Heading, Text, Icon } from '@aws-amplify/ui-react';
 import Header from "../Header"
 import Markdown from 'react-markdown'
-import { Comment, User, Like } from '../../models';
+import { Comment, User, Like, LikeComment } from '../../models';
 import { useRef } from 'react';
 
 const PostComponent = () => {
@@ -18,17 +18,16 @@ const PostComponent = () => {
     const [user, setUser] = useState([])
     const commentRef = useRef(null); // コメント入力要素のrefを作成
     const [like_id, setLikeId] = useState("")
+    const [like_my_comment, setLikeMyComment] = useState([])
+    const [like_comment_counts, setLikeCommentCounts] = useState([])
     
     // パスパラメータからidを取得
     const router = useRouter()
     const param_id = router.query.id
     const { tokens } = useTheme()
 
-    // 初期ロード時の処理
+    // リアルタイム表示の設定
     useEffect(() => {
-        doInit()
-        // Comment取得
-        getComment()
         // real time functionality
         DataStore.observe(Post).subscribe(()  => {
             doInit()
@@ -39,6 +38,13 @@ const PostComponent = () => {
         DataStore.observe(Comment).subscribe(()  => {
             getComment()
         })
+    }, [])
+
+    // 初期ロード時の処理
+    useEffect(() => {
+        doInit()
+        // Comment取得
+        getComment()
     }, [param_id])
 
     // 初期処理
@@ -63,7 +69,7 @@ const PostComponent = () => {
                 console.log("Error when retrieving DB during doInit().....")
             }
 
-            // User全取得（ニックネーム取得用） TODO：データ件数多い場合の対処要
+            // User全取得　TODO：ニックネーム取得要／TODO：データ件数多い場合の対処要
             const user_result = await DataStore.query(User)
             if (user_result && user_result.length > 0) {
                 setUser(user_result)
@@ -75,6 +81,43 @@ const PostComponent = () => {
             if (like_result && like_result.length > 0) {
                 setLikeId(like_result[0].id)
                 console.log("Success in taking Like.")
+            }
+        }
+    }
+
+    // （記事に紐づく）コメントリスト取得
+    async function getComment() {
+        if (param_id) {
+            // 現記事idに紐づくCommentを取得
+            const comment_result = await DataStore.query(Comment, (c) => c.post_id.eq(param_id), {
+                sort:(s) => s.updatedAt(SortDirection.DESCENDING),
+            })
+            if (comment_result && comment_result.length > 0) {
+                setComment(comment_result)
+                console.log("Success in taking Comment.")
+            }
+
+            // 現記事idに紐づくLikeCommentの件数取得
+            const like_comment_result = await DataStore.query(LikeComment, (c) => c.post_id.eq(param_id))
+            if (like_comment_result && like_comment_result.length > 0) {
+                // 件数カウント
+                const commentCounts = {}; // オブジェクトを作成して各 comment_id の件数を管理
+                like_comment_result.forEach(likeComment => {
+                    const commentId = likeComment.comment_id;
+                    commentCounts[commentId] = (commentCounts[commentId] || 0) + 1; // comment_id ごとにカウントを増やす
+                });
+                setLikeCommentCounts(commentCounts)
+                console.log("Success in taking LikeComment count.", commentCounts)
+            }
+
+            // 現記事id＋自分のLikeComment取得（複数） //TODO: ユーザーID指定
+            const like_my_comment_result = await DataStore.query(LikeComment, (c) => c.and(c => [
+                c.post_id.eq(param_id),
+                c.user_id.eq("dummy"), // TODO
+            ]))
+            if (like_my_comment_result && like_my_comment_result.length > 0) {
+                setLikeMyComment(like_my_comment_result)
+                console.log("Success in taking my LikeComment.", like_my_comment_result)
             }
         }
     }
@@ -104,27 +147,16 @@ const PostComponent = () => {
         }
     }
 
-    // コメント再取得
-    async function getComment() {
-        if (param_id) {
-            console.log("Start getting comment.")
-            // 現記事idのCommentを取得
-            const comment_result = await DataStore.query(Comment, (c) => c.post_id.eq(param_id), {
-                sort:(s) => s.updatedAt(SortDirection.DESCENDING),
-            })
-            if (comment_result && comment_result.length > 0) {
-                setComment(comment_result)
-                console.log("Success in taking Comment.")
-            }
-        }
-    }
-
     // コメント削除クリック
     const onCommentDelete = async (comment_id) => {
         try {
             const modelToDelete = await DataStore.query(Comment, comment_id)
             await DataStore.delete(modelToDelete)
             console.log("Comment successfully deleted.")
+
+            const modelToDelete2 = await DataStore.query(LikeComment, comment_id)
+            await DataStore.delete(modelToDelete2)
+            console.log("LikeComment successfully deleted.")
         }
         catch (error) {
             console.error('コメント削除時にエラーが発生しました:', error)
@@ -158,6 +190,43 @@ const PostComponent = () => {
             console.error('いいね時にエラーが発生しました:', error)
         }
     }
+
+    // （コメントに）いいねクリック
+    const onLikeCommentClick = async (comment_id, like_flag) => {
+        try {
+            // 「いいね」していない場合→追加
+            if (!like_flag) {
+                console.log("comment_id", comment_id)
+                await DataStore.save(
+                    new LikeComment({
+                        "comment_id": comment_id,
+                        "user_id": "dummy", // TODO
+                        "like_flag": true,
+                        "post_id": id
+                    })
+                );
+                // LikeComment含め再取得
+                getComment()
+                console.log("Successfully like to a comment.")
+            }
+            // 「いいね」している場合→削除
+            else {
+                const modelToDelete = await DataStore.query(LikeComment, (c) => c.and(c => [
+                    c.comment_id.eq(comment_id),
+                    c.user_id.eq("dummy"), // TODO
+                ]))
+                console.log("model", modelToDelete[0].id)
+                await DataStore.delete(LikeComment, modelToDelete[0].id);
+                // LikeComment含め再取得
+                getComment()
+                console.log("Successfully deleted like.")
+            }
+        }
+        catch (error) {
+            console.error('いいね時にエラーが発生しました:', error)
+        }
+    }
+
 
     // UTCを日本時間に変換する関数
     const convertUTCtoJST = (utcDateString) => {
@@ -318,15 +387,46 @@ const PostComponent = () => {
                                             {/* TODO：自コメントの場合のみ「削除」表示 */}
                                             <Button variation="link" size="small" onClick={() => onCommentDelete(commentItem.id)}>削除</Button>
                                             <Button variation="default" size="small">返信</Button>
-                                            {/* TODO：コメントに対するいいねリンク追加 */}
-                                            <Icon
-                                                ariaLabel="Favorite"
-                                                viewBox={{ width: 24, height: 24 }}
-                                                pathData="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0
-                                                3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"
-                                                fill="lightgray"
-                                            />
-                                            0
+                                            {/***** コメントに対するいいねボタン *****/}
+                                            {
+                                                like_my_comment.find((lmc) => lmc.comment_id === commentItem.id) ?
+                                                <Button 
+                                                    variation="default" 
+                                                    size="small" 
+                                                    style={{ width: '10px', border: 'none' }}
+                                                    onClick={() => onLikeCommentClick(commentItem.id, true)}
+                                                >
+                                                    <Icon
+                                                        ariaLabel="Favorite"
+                                                        viewBox={{ width: 24, height: 24 }}
+                                                        pathData="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0
+                                                        3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"
+                                                        fill="red"
+                                                    />
+                                                </Button>
+                                                :
+                                                <Button 
+                                                    variation="default" 
+                                                    size="small" 
+                                                    style={{ width: '10px', border: 'none' }}
+                                                    onClick={() => onLikeCommentClick(commentItem.id, false)}
+                                                >
+                                                    <Icon
+                                                        ariaLabel="Favorite"
+                                                        viewBox={{ width: 24, height: 24 }}
+                                                        pathData="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0
+                                                        3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"
+                                                        fill="lightgray"
+                                                    />
+                                                </Button>
+                                            }
+                                            {/***** コメントに対するいいねの件数 *****/}
+                                            {
+                                                like_comment_counts[commentItem.id] ?
+                                                like_comment_counts[commentItem.id]
+                                                :
+                                                0
+                                            }
                                         </Flex>
                                     </Flex>
                                 </Card>

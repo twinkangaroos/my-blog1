@@ -5,7 +5,7 @@
  **************************************************************************/
 
 import * as React from "react";
-import { GridProps, TextFieldProps } from "@aws-amplify/ui-react";
+import { GridProps, SwitchFieldProps, TextFieldProps } from "@aws-amplify/ui-react";
 import { EscapeHatchProps } from "@aws-amplify/ui-react/internal";
 export declare type ValidationResponse = {
     hasError: boolean;
@@ -15,13 +15,13 @@ export declare type ValidationFunction<T> = (value: T, validationResponse: Valid
 export declare type LikeCommentCreateFormInputValues = {
     comment_id?: string;
     user_id?: string;
-    like_flag?: string;
+    like_flag?: boolean;
     post_id?: string;
 };
 export declare type LikeCommentCreateFormValidationValues = {
     comment_id?: ValidationFunction<string>;
     user_id?: ValidationFunction<string>;
-    like_flag?: ValidationFunction<string>;
+    like_flag?: ValidationFunction<boolean>;
     post_id?: ValidationFunction<string>;
 };
 export declare type PrimitiveOverrideProps<T> = Partial<T> & React.DOMAttributes<HTMLDivElement>;
@@ -29,7 +29,7 @@ export declare type LikeCommentCreateFormOverridesProps = {
     LikeCommentCreateFormGrid?: PrimitiveOverrideProps<GridProps>;
     comment_id?: PrimitiveOverrideProps<TextFieldProps>;
     user_id?: PrimitiveOverrideProps<TextFieldProps>;
-    like_flag?: PrimitiveOverrideProps<TextFieldProps>;
+    like_flag?: PrimitiveOverrideProps<SwitchFieldProps>;
     post_id?: PrimitiveOverrideProps<TextFieldProps>;
 } & EscapeHatchProps;
 export declare type LikeCommentCreateFormProps = React.PropsWithChildren<{
