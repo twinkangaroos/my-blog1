@@ -6,6 +6,136 @@ import { LazyLoading, LazyLoadingDisabled } from "@aws-amplify/datastore";
 
 
 
+type EagerUser = {
+  readonly [__modelMeta__]: {
+    identifier: ManagedIdentifier<User, 'id'>;
+    readOnlyFields: 'createdAt' | 'updatedAt';
+  };
+  readonly id: string;
+  readonly user_id?: string | null;
+  readonly email?: string | null;
+  readonly nickname?: string | null;
+  readonly createdAt?: string | null;
+  readonly updatedAt?: string | null;
+}
+
+type LazyUser = {
+  readonly [__modelMeta__]: {
+    identifier: ManagedIdentifier<User, 'id'>;
+    readOnlyFields: 'createdAt' | 'updatedAt';
+  };
+  readonly id: string;
+  readonly user_id?: string | null;
+  readonly email?: string | null;
+  readonly nickname?: string | null;
+  readonly createdAt?: string | null;
+  readonly updatedAt?: string | null;
+}
+
+export declare type User = LazyLoading extends LazyLoadingDisabled ? EagerUser : LazyUser
+
+export declare const User: (new (init: ModelInit<User>) => User) & {
+  copyOf(source: User, mutator: (draft: MutableModel<User>) => MutableModel<User> | void): User;
+}
+
+type EagerCommentReply = {
+  readonly [__modelMeta__]: {
+    identifier: ManagedIdentifier<CommentReply, 'id'>;
+    readOnlyFields: 'createdAt' | 'updatedAt';
+  };
+  readonly id: string;
+  readonly post_id?: string | null;
+  readonly comment_id?: string | null;
+  readonly user_id?: string | null;
+  readonly comment?: string | null;
+  readonly createdAt?: string | null;
+  readonly updatedAt?: string | null;
+}
+
+type LazyCommentReply = {
+  readonly [__modelMeta__]: {
+    identifier: ManagedIdentifier<CommentReply, 'id'>;
+    readOnlyFields: 'createdAt' | 'updatedAt';
+  };
+  readonly id: string;
+  readonly post_id?: string | null;
+  readonly comment_id?: string | null;
+  readonly user_id?: string | null;
+  readonly comment?: string | null;
+  readonly createdAt?: string | null;
+  readonly updatedAt?: string | null;
+}
+
+export declare type CommentReply = LazyLoading extends LazyLoadingDisabled ? EagerCommentReply : LazyCommentReply
+
+export declare const CommentReply: (new (init: ModelInit<CommentReply>) => CommentReply) & {
+  copyOf(source: CommentReply, mutator: (draft: MutableModel<CommentReply>) => MutableModel<CommentReply> | void): CommentReply;
+}
+
+type EagerLike = {
+  readonly [__modelMeta__]: {
+    identifier: ManagedIdentifier<Like, 'id'>;
+    readOnlyFields: 'createdAt' | 'updatedAt';
+  };
+  readonly id: string;
+  readonly post_id?: string | null;
+  readonly user_id?: string | null;
+  readonly like_flag?: boolean | null;
+  readonly createdAt?: string | null;
+  readonly updatedAt?: string | null;
+}
+
+type LazyLike = {
+  readonly [__modelMeta__]: {
+    identifier: ManagedIdentifier<Like, 'id'>;
+    readOnlyFields: 'createdAt' | 'updatedAt';
+  };
+  readonly id: string;
+  readonly post_id?: string | null;
+  readonly user_id?: string | null;
+  readonly like_flag?: boolean | null;
+  readonly createdAt?: string | null;
+  readonly updatedAt?: string | null;
+}
+
+export declare type Like = LazyLoading extends LazyLoadingDisabled ? EagerLike : LazyLike
+
+export declare const Like: (new (init: ModelInit<Like>) => Like) & {
+  copyOf(source: Like, mutator: (draft: MutableModel<Like>) => MutableModel<Like> | void): Like;
+}
+
+type EagerComment = {
+  readonly [__modelMeta__]: {
+    identifier: ManagedIdentifier<Comment, 'id'>;
+    readOnlyFields: 'createdAt' | 'updatedAt';
+  };
+  readonly id: string;
+  readonly post_id?: string | null;
+  readonly user_id?: string | null;
+  readonly comment?: string | null;
+  readonly createdAt?: string | null;
+  readonly updatedAt?: string | null;
+}
+
+type LazyComment = {
+  readonly [__modelMeta__]: {
+    identifier: ManagedIdentifier<Comment, 'id'>;
+    readOnlyFields: 'createdAt' | 'updatedAt';
+  };
+  readonly id: string;
+  readonly post_id?: string | null;
+  readonly user_id?: string | null;
+  readonly comment?: string | null;
+  readonly createdAt?: string | null;
+  readonly updatedAt?: string | null;
+}
+
+export declare type Comment = LazyLoading extends LazyLoadingDisabled ? EagerComment : LazyComment
+
+export declare const Comment: (new (init: ModelInit<Comment>) => Comment) & {
+  copyOf(source: Comment, mutator: (draft: MutableModel<Comment>) => MutableModel<Comment> | void): Comment;
+}
+
 type EagerPostList = {
   readonly [__modelMeta__]: {
     identifier: ManagedIdentifier<PostList, 'id'>;

@@ -41,7 +41,7 @@ const PostList = () => {
         router.push(`/admin/create_post`)
     }
 
-    // 日付を成形する関数
+    // 日付を成形する関数 TODO:共通化
     const extractDateAndTimeChars = (dateString) => {
         if (dateString) {
             return dateString.substring(0, 10) + " " + dateString.substring(11, 19)
