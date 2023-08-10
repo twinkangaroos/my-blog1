@@ -1,3 +1,11 @@
+type LikeComment @model @auth(rules: [{allow: public}]) {
+  id: ID!
+  comment_id: String
+  user_id: String
+  like_flag: String
+  post_id: String
+}
+
 type User @model @auth(rules: [{allow: public}]) {
   id: ID!
   user_id: String
@@ -7,10 +15,10 @@ type User @model @auth(rules: [{allow: public}]) {
 
 type CommentReply @model @auth(rules: [{allow: public}]) {
   id: ID!
-  post_id: String
   comment_id: String
   user_id: String
   comment: String
+  post_id: String
 }
 
 type Like @model @auth(rules: [{allow: public}]) {

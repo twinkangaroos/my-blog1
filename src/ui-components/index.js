@@ -5,6 +5,8 @@
  **************************************************************************/
 
 export { default as studioTheme } from "./studioTheme";
+export { default as LikeCommentCreateForm } from "./LikeCommentCreateForm";
+export { default as LikeCommentUpdateForm } from "./LikeCommentUpdateForm";
 export { default as UserCreateForm } from "./UserCreateForm";
 export { default as UserUpdateForm } from "./UserUpdateForm";
 export { default as CommentReplyCreateForm } from "./CommentReplyCreateForm";

@@ -27,6 +27,8 @@ const PostComponent = () => {
     // 初期ロード時の処理
     useEffect(() => {
         doInit()
+        // Comment取得
+        getComment()
         // real time functionality
         DataStore.observe(Post).subscribe(()  => {
             doInit()
@@ -68,13 +70,9 @@ const PostComponent = () => {
                 console.log("Success in taking all User.")
             }
 
-            // Comment取得
-            getComment()
-
             // Like取得 //TODO: ユーザーID指定
             const like_result = await DataStore.query(Like, (c) => c.user_id.eq("dummy"))
             if (like_result && like_result.length > 0) {
-                console.log("like", like_result)
                 setLikeId(like_result[0].id)
                 console.log("Success in taking Like.")
             }
@@ -82,8 +80,7 @@ const PostComponent = () => {
     }
 
     // コメントするクリック
-    const onCommentClick = async (e) => {
-        e.preventDefault()
+    const onCommentClick = async () => {
         if (!my_comment) {
             alert("コメントを入力してください。")
             return
@@ -109,14 +106,16 @@ const PostComponent = () => {
 
     // コメント再取得
     async function getComment() {
-        console.log("Start getting comment.")
-        // 現記事idのCommentを取得
-        const comment_result = await DataStore.query(Comment, (c) => c.post_id.eq(param_id), {
-            sort:(s) => s.updatedAt(SortDirection.DESCENDING),
-        })
-        if (comment_result && comment_result.length > 0) {
-            setComment(comment_result)
-            console.log("Success in taking Comment.")
+        if (param_id) {
+            console.log("Start getting comment.")
+            // 現記事idのCommentを取得
+            const comment_result = await DataStore.query(Comment, (c) => c.post_id.eq(param_id), {
+                sort:(s) => s.updatedAt(SortDirection.DESCENDING),
+            })
+            if (comment_result && comment_result.length > 0) {
+                setComment(comment_result)
+                console.log("Success in taking Comment.")
+            }
         }
     }
 
@@ -150,7 +149,6 @@ const PostComponent = () => {
             // 「いいね」している場合→削除
             else {
                 const modelToDelete = await DataStore.query(Like, like_id);
-                console.log("modelToDelete", modelToDelete);
                 DataStore.delete(modelToDelete);
                 setLikeId("")
                 console.log("Successfully deleted like.")
@@ -284,7 +282,7 @@ const PostComponent = () => {
                                 size="Large" 
                                 isFullWidth={true}
                                 style={{  width: '200px', marginTop: '20px', backgroundColor: 'red' }}
-                                onClick={onCommentClick}
+                                onClick={() => onCommentClick()}
                             >コメントする</Button>
                         </Flex>
 

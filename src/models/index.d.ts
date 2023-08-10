@@ -6,6 +6,40 @@ import { LazyLoading, LazyLoadingDisabled } from "@aws-amplify/datastore";
 
 
 
+type EagerLikeComment = {
+  readonly [__modelMeta__]: {
+    identifier: ManagedIdentifier<LikeComment, 'id'>;
+    readOnlyFields: 'createdAt' | 'updatedAt';
+  };
+  readonly id: string;
+  readonly comment_id?: string | null;
+  readonly user_id?: string | null;
+  readonly like_flag?: string | null;
+  readonly post_id?: string | null;
+  readonly createdAt?: string | null;
+  readonly updatedAt?: string | null;
+}
+
+type LazyLikeComment = {
+  readonly [__modelMeta__]: {
+    identifier: ManagedIdentifier<LikeComment, 'id'>;
+    readOnlyFields: 'createdAt' | 'updatedAt';
+  };
+  readonly id: string;
+  readonly comment_id?: string | null;
+  readonly user_id?: string | null;
+  readonly like_flag?: string | null;
+  readonly post_id?: string | null;
+  readonly createdAt?: string | null;
+  readonly updatedAt?: string | null;
+}
+
+export declare type LikeComment = LazyLoading extends LazyLoadingDisabled ? EagerLikeComment : LazyLikeComment
+
+export declare const LikeComment: (new (init: ModelInit<LikeComment>) => LikeComment) & {
+  copyOf(source: LikeComment, mutator: (draft: MutableModel<LikeComment>) => MutableModel<LikeComment> | void): LikeComment;
+}
+
 type EagerUser = {
   readonly [__modelMeta__]: {
     identifier: ManagedIdentifier<User, 'id'>;
@@ -44,10 +78,10 @@ type EagerCommentReply = {
     readOnlyFields: 'createdAt' | 'updatedAt';
   };
   readonly id: string;
-  readonly post_id?: string | null;
   readonly comment_id?: string | null;
   readonly user_id?: string | null;
   readonly comment?: string | null;
+  readonly post_id?: string | null;
   readonly createdAt?: string | null;
   readonly updatedAt?: string | null;
 }
@@ -58,10 +92,10 @@ type LazyCommentReply = {
     readOnlyFields: 'createdAt' | 'updatedAt';
   };
   readonly id: string;
-  readonly post_id?: string | null;
   readonly comment_id?: string | null;
   readonly user_id?: string | null;
   readonly comment?: string | null;
+  readonly post_id?: string | null;
   readonly createdAt?: string | null;
   readonly updatedAt?: string | null;
 }

@@ -7,41 +7,41 @@
 import * as React from "react";
 import { GridProps, TextFieldProps } from "@aws-amplify/ui-react";
 import { EscapeHatchProps } from "@aws-amplify/ui-react/internal";
-import { CommentReply } from "../models";
+import { LikeComment } from "../models";
 export declare type ValidationResponse = {
     hasError: boolean;
     errorMessage?: string;
 };
 export declare type ValidationFunction<T> = (value: T, validationResponse: ValidationResponse) => ValidationResponse | Promise<ValidationResponse>;
-export declare type CommentReplyUpdateFormInputValues = {
+export declare type LikeCommentUpdateFormInputValues = {
     comment_id?: string;
     user_id?: string;
-    comment?: string;
+    like_flag?: string;
     post_id?: string;
 };
-export declare type CommentReplyUpdateFormValidationValues = {
+export declare type LikeCommentUpdateFormValidationValues = {
     comment_id?: ValidationFunction<string>;
     user_id?: ValidationFunction<string>;
-    comment?: ValidationFunction<string>;
+    like_flag?: ValidationFunction<string>;
     post_id?: ValidationFunction<string>;
 };
 export declare type PrimitiveOverrideProps<T> = Partial<T> & React.DOMAttributes<HTMLDivElement>;
-export declare type CommentReplyUpdateFormOverridesProps = {
-    CommentReplyUpdateFormGrid?: PrimitiveOverrideProps<GridProps>;
+export declare type LikeCommentUpdateFormOverridesProps = {
+    LikeCommentUpdateFormGrid?: PrimitiveOverrideProps<GridProps>;
     comment_id?: PrimitiveOverrideProps<TextFieldProps>;
     user_id?: PrimitiveOverrideProps<TextFieldProps>;
-    comment?: PrimitiveOverrideProps<TextFieldProps>;
+    like_flag?: PrimitiveOverrideProps<TextFieldProps>;
     post_id?: PrimitiveOverrideProps<TextFieldProps>;
 } & EscapeHatchProps;
-export declare type CommentReplyUpdateFormProps = React.PropsWithChildren<{
-    overrides?: CommentReplyUpdateFormOverridesProps | undefined | null;
+export declare type LikeCommentUpdateFormProps = React.PropsWithChildren<{
+    overrides?: LikeCommentUpdateFormOverridesProps | undefined | null;
 } & {
     id?: string;
-    commentReply?: CommentReply;
-    onSubmit?: (fields: CommentReplyUpdateFormInputValues) => CommentReplyUpdateFormInputValues;
-    onSuccess?: (fields: CommentReplyUpdateFormInputValues) => void;
-    onError?: (fields: CommentReplyUpdateFormInputValues, errorMessage: string) => void;
-    onChange?: (fields: CommentReplyUpdateFormInputValues) => CommentReplyUpdateFormInputValues;
-    onValidate?: CommentReplyUpdateFormValidationValues;
+    likeComment?: LikeComment;
+    onSubmit?: (fields: LikeCommentUpdateFormInputValues) => LikeCommentUpdateFormInputValues;
+    onSuccess?: (fields: LikeCommentUpdateFormInputValues) => void;
+    onError?: (fields: LikeCommentUpdateFormInputValues, errorMessage: string) => void;
+    onChange?: (fields: LikeCommentUpdateFormInputValues) => LikeCommentUpdateFormInputValues;
+    onValidate?: LikeCommentUpdateFormValidationValues;
 } & React.CSSProperties>;
-export default function CommentReplyUpdateForm(props: CommentReplyUpdateFormProps): React.ReactElement;
+export default function LikeCommentUpdateForm(props: LikeCommentUpdateFormProps): React.ReactElement;

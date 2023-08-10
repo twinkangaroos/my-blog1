@@ -8,13 +8,13 @@
 import * as React from "react";
 import { Button, Flex, Grid, TextField } from "@aws-amplify/ui-react";
 import { getOverrideProps } from "@aws-amplify/ui-react/internal";
-import { CommentReply } from "../models";
+import { LikeComment } from "../models";
 import { fetchByPath, validateField } from "./utils";
 import { DataStore } from "aws-amplify";
-export default function CommentReplyUpdateForm(props) {
+export default function LikeCommentUpdateForm(props) {
   const {
     id: idProp,
-    commentReply,
+    likeComment,
     onSuccess,
     onError,
     onSubmit,
@@ -26,40 +26,39 @@ export default function CommentReplyUpdateForm(props) {
   const initialValues = {
     comment_id: "",
     user_id: "",
-    comment: "",
+    like_flag: "",
     post_id: "",
   };
   const [comment_id, setComment_id] = React.useState(initialValues.comment_id);
   const [user_id, setUser_id] = React.useState(initialValues.user_id);
-  const [comment, setComment] = React.useState(initialValues.comment);
+  const [like_flag, setLike_flag] = React.useState(initialValues.like_flag);
   const [post_id, setPost_id] = React.useState(initialValues.post_id);
   const [errors, setErrors] = React.useState({});
   const resetStateValues = () => {
-    const cleanValues = commentReplyRecord
-      ? { ...initialValues, ...commentReplyRecord }
+    const cleanValues = likeCommentRecord
+      ? { ...initialValues, ...likeCommentRecord }
       : initialValues;
     setComment_id(cleanValues.comment_id);
     setUser_id(cleanValues.user_id);
-    setComment(cleanValues.comment);
+    setLike_flag(cleanValues.like_flag);
     setPost_id(cleanValues.post_id);
     setErrors({});
   };
-  const [commentReplyRecord, setCommentReplyRecord] =
-    React.useState(commentReply);
+  const [likeCommentRecord, setLikeCommentRecord] = React.useState(likeComment);
   React.useEffect(() => {
     const queryData = async () => {
       const record = idProp
-        ? await DataStore.query(CommentReply, idProp)
-        : commentReply;
-      setCommentReplyRecord(record);
+        ? await DataStore.query(LikeComment, idProp)
+        : likeComment;
+      setLikeCommentRecord(record);
     };
     queryData();
-  }, [idProp, commentReply]);
-  React.useEffect(resetStateValues, [commentReplyRecord]);
+  }, [idProp, likeComment]);
+  React.useEffect(resetStateValues, [likeCommentRecord]);
   const validations = {
     comment_id: [],
     user_id: [],
-    comment: [],
+    like_flag: [],
     post_id: [],
   };
   const runValidationTasks = async (
@@ -89,7 +88,7 @@ export default function CommentReplyUpdateForm(props) {
         let modelFields = {
           comment_id,
           user_id,
-          comment,
+          like_flag,
           post_id,
         };
         const validationResponses = await Promise.all(
@@ -121,7 +120,7 @@ export default function CommentReplyUpdateForm(props) {
             }
           });
           await DataStore.save(
-            CommentReply.copyOf(commentReplyRecord, (updated) => {
+            LikeComment.copyOf(likeCommentRecord, (updated) => {
               Object.assign(updated, modelFields);
             })
           );
@@ -134,7 +133,7 @@ export default function CommentReplyUpdateForm(props) {
           }
         }
       }}
-      {...getOverrideProps(overrides, "CommentReplyUpdateForm")}
+      {...getOverrideProps(overrides, "LikeCommentUpdateForm")}
       {...rest}
     >
       <TextField
@@ -148,7 +147,7 @@ export default function CommentReplyUpdateForm(props) {
             const modelFields = {
               comment_id: value,
               user_id,
-              comment,
+              like_flag,
               post_id,
             };
             const result = onChange(modelFields);
@@ -175,7 +174,7 @@ export default function CommentReplyUpdateForm(props) {
             const modelFields = {
               comment_id,
               user_id: value,
-              comment,
+              like_flag,
               post_id,
             };
             const result = onChange(modelFields);
@@ -192,31 +191,31 @@ export default function CommentReplyUpdateForm(props) {
         {...getOverrideProps(overrides, "user_id")}
       ></TextField>
       <TextField
-        label="Comment"
+        label="Like flag"
         isRequired={false}
         isReadOnly={false}
-        value={comment}
+        value={like_flag}
         onChange={(e) => {
           let { value } = e.target;
           if (onChange) {
             const modelFields = {
               comment_id,
               user_id,
-              comment: value,
+              like_flag: value,
               post_id,
             };
             const result = onChange(modelFields);
-            value = result?.comment ?? value;
+            value = result?.like_flag ?? value;
           }
-          if (errors.comment?.hasError) {
-            runValidationTasks("comment", value);
+          if (errors.like_flag?.hasError) {
+            runValidationTasks("like_flag", value);
           }
-          setComment(value);
+          setLike_flag(value);
         }}
-        onBlur={() => runValidationTasks("comment", comment)}
-        errorMessage={errors.comment?.errorMessage}
-        hasError={errors.comment?.hasError}
-        {...getOverrideProps(overrides, "comment")}
+        onBlur={() => runValidationTasks("like_flag", like_flag)}
+        errorMessage={errors.like_flag?.errorMessage}
+        hasError={errors.like_flag?.hasError}
+        {...getOverrideProps(overrides, "like_flag")}
       ></TextField>
       <TextField
         label="Post id"
@@ -229,7 +228,7 @@ export default function CommentReplyUpdateForm(props) {
             const modelFields = {
               comment_id,
               user_id,
-              comment,
+              like_flag,
               post_id: value,
             };
             const result = onChange(modelFields);
@@ -256,7 +255,7 @@ export default function CommentReplyUpdateForm(props) {
             event.preventDefault();
             resetStateValues();
           }}
-          isDisabled={!(idProp || commentReply)}
+          isDisabled={!(idProp || likeComment)}
           {...getOverrideProps(overrides, "ResetButton")}
         ></Button>
         <Flex
@@ -268,7 +267,7 @@ export default function CommentReplyUpdateForm(props) {
             type="submit"
             variation="primary"
             isDisabled={
-              !(idProp || commentReply) ||
+              !(idProp || likeComment) ||
               Object.values(errors).some((e) => e?.hasError)
             }
             {...getOverrideProps(overrides, "SubmitButton")}

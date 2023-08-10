@@ -23,28 +23,28 @@ export default function CommentReplyCreateForm(props) {
     ...rest
   } = props;
   const initialValues = {
-    post_id: "",
     comment_id: "",
     user_id: "",
     comment: "",
+    post_id: "",
   };
-  const [post_id, setPost_id] = React.useState(initialValues.post_id);
   const [comment_id, setComment_id] = React.useState(initialValues.comment_id);
   const [user_id, setUser_id] = React.useState(initialValues.user_id);
   const [comment, setComment] = React.useState(initialValues.comment);
+  const [post_id, setPost_id] = React.useState(initialValues.post_id);
   const [errors, setErrors] = React.useState({});
   const resetStateValues = () => {
-    setPost_id(initialValues.post_id);
     setComment_id(initialValues.comment_id);
     setUser_id(initialValues.user_id);
     setComment(initialValues.comment);
+    setPost_id(initialValues.post_id);
     setErrors({});
   };
   const validations = {
-    post_id: [],
     comment_id: [],
     user_id: [],
     comment: [],
+    post_id: [],
   };
   const runValidationTasks = async (
     fieldName,
@@ -71,10 +71,10 @@ export default function CommentReplyCreateForm(props) {
       onSubmit={async (event) => {
         event.preventDefault();
         let modelFields = {
-          post_id,
           comment_id,
           user_id,
           comment,
+          post_id,
         };
         const validationResponses = await Promise.all(
           Object.keys(validations).reduce((promises, fieldName) => {
@@ -121,33 +121,6 @@ export default function CommentReplyCreateForm(props) {
       {...rest}
     >
       <TextField
-        label="Post id"
-        isRequired={false}
-        isReadOnly={false}
-        value={post_id}
-        onChange={(e) => {
-          let { value } = e.target;
-          if (onChange) {
-            const modelFields = {
-              post_id: value,
-              comment_id,
-              user_id,
-              comment,
-            };
-            const result = onChange(modelFields);
-            value = result?.post_id ?? value;
-          }
-          if (errors.post_id?.hasError) {
-            runValidationTasks("post_id", value);
-          }
-          setPost_id(value);
-        }}
-        onBlur={() => runValidationTasks("post_id", post_id)}
-        errorMessage={errors.post_id?.errorMessage}
-        hasError={errors.post_id?.hasError}
-        {...getOverrideProps(overrides, "post_id")}
-      ></TextField>
-      <TextField
         label="Comment id"
         isRequired={false}
         isReadOnly={false}
@@ -156,10 +129,10 @@ export default function CommentReplyCreateForm(props) {
           let { value } = e.target;
           if (onChange) {
             const modelFields = {
-              post_id,
               comment_id: value,
               user_id,
               comment,
+              post_id,
             };
             const result = onChange(modelFields);
             value = result?.comment_id ?? value;
@@ -183,10 +156,10 @@ export default function CommentReplyCreateForm(props) {
           let { value } = e.target;
           if (onChange) {
             const modelFields = {
-              post_id,
               comment_id,
               user_id: value,
               comment,
+              post_id,
             };
             const result = onChange(modelFields);
             value = result?.user_id ?? value;
@@ -210,10 +183,10 @@ export default function CommentReplyCreateForm(props) {
           let { value } = e.target;
           if (onChange) {
             const modelFields = {
-              post_id,
               comment_id,
               user_id,
               comment: value,
+              post_id,
             };
             const result = onChange(modelFields);
             value = result?.comment ?? value;
@@ -227,6 +200,33 @@ export default function CommentReplyCreateForm(props) {
         errorMessage={errors.comment?.errorMessage}
         hasError={errors.comment?.hasError}
         {...getOverrideProps(overrides, "comment")}
+      ></TextField>
+      <TextField
+        label="Post id"
+        isRequired={false}
+        isReadOnly={false}
+        value={post_id}
+        onChange={(e) => {
+          let { value } = e.target;
+          if (onChange) {
+            const modelFields = {
+              comment_id,
+              user_id,
+              comment,
+              post_id: value,
+            };
+            const result = onChange(modelFields);
+            value = result?.post_id ?? value;
+          }
+          if (errors.post_id?.hasError) {
+            runValidationTasks("post_id", value);
+          }
+          setPost_id(value);
+        }}
+        onBlur={() => runValidationTasks("post_id", post_id)}
+        errorMessage={errors.post_id?.errorMessage}
+        hasError={errors.post_id?.hasError}
+        {...getOverrideProps(overrides, "post_id")}
       ></TextField>
       <Flex
         justifyContent="space-between"
