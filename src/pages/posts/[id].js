@@ -83,13 +83,15 @@ const PostComponent = () => {
             }
 
             // 当記事に対する自分のLike有無を取得
-            const like_result = await DataStore.query(Like, (c) => c.and(c => [
-                c.post_id.eq(param_id),
-                c.user_id.eq(user.username),
-            ]))
-            if (like_result && like_result.length > 0) {
-                setLikeId(like_result[0].id)
-                console.log("Success in taking Like.")
+            if (user) {
+                const like_result = await DataStore.query(Like, (c) => c.and(c => [
+                    c.post_id.eq(param_id),
+                    c.user_id.eq(user.username),
+                ]))
+                if (like_result && like_result.length > 0) {
+                    setLikeId(like_result[0].id)
+                    console.log("Success in taking Like.")
+                }
             }
         }
     }
@@ -154,17 +156,19 @@ const PostComponent = () => {
             console.log("Success in taking LikeComment count.")
 
             // 現記事id＋自分のLikeComment取得（複数）
-            const like_my_comment_result = await DataStore.query(LikeComment, (c) => c.and(c => [
-                c.post_id.eq(param_id),
-                c.user_id.eq(user.username),
-            ]))
-            if (like_my_comment_result && like_my_comment_result.length > 0) {
-                setLikeMyComment(like_my_comment_result)
+            if (user) {
+                const like_my_comment_result = await DataStore.query(LikeComment, (c) => c.and(c => [
+                    c.post_id.eq(param_id),
+                    c.user_id.eq(user.username),
+                ]))
+                if (like_my_comment_result && like_my_comment_result.length > 0) {
+                    setLikeMyComment(like_my_comment_result)
+                }
+                else {
+                    setLikeMyComment([])
+                }
+                console.log("Success in taking my LikeComment.")
             }
-            else {
-                setLikeMyComment([])
-            }
-            console.log("Success in taking my LikeComment.")
         }
     }
 
@@ -172,6 +176,10 @@ const PostComponent = () => {
     const onCommentClick = async () => {
         if (!my_comment) {
             alert("コメントを入力してください。")
+            return
+        }
+        if (!user) {
+            alert("ログインしてください。")
             return
         }
         try {
@@ -198,7 +206,6 @@ const PostComponent = () => {
     // （自分の）記事に対するコメント削除クリック
     const onCommentDelete = async (comment_id) => {
         try {
-            console.log("comment_id", comment_id)
             const modelToDelete = await DataStore.query(Comment, comment_id)
             if (modelToDelete) {
                 await DataStore.delete(modelToDelete)
@@ -221,6 +228,10 @@ const PostComponent = () => {
     // （この記事に）いいねクリック
     const onLikeClick = async () => {
         try {
+            if (!user) {
+                alert("ログインしてください。")
+                return
+            }
             // 「いいね」していない場合→追加
             if (!like_id) {
                 const newLike = await DataStore.save(
@@ -249,6 +260,10 @@ const PostComponent = () => {
     // （コメントに）いいねクリック
     const onLikeCommentClick = async (comment_id, like_flag) => {
         try {
+            if (!user) {
+                alert("ログインしてください。")
+                return
+            }
             // 「いいね」していない場合→追加
             if (!like_flag) {
                 await DataStore.save(
@@ -354,6 +369,8 @@ const PostComponent = () => {
                         }
                         
                         <Flex justifyContent="center">
+                        {
+                            user && like_id ?
                             <Button 
                                 variation="default" 
                                 size="Large" 
@@ -361,32 +378,56 @@ const PostComponent = () => {
                                 style={{ width: '180px', marginTop: '20px', borderColor: 'red' }}
                                 onClick={() => onLikeClick()}
                             >
-                                {
-                                    like_id ?
-                                    <>
-                                        <Icon
-                                            ariaLabel="Favorite"
-                                            viewBox={{ width: 24, height: 24 }}
-                                            pathData="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0
-                                            3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"
-                                            fill="red"
-                                        />
-                                        &nbsp;いいねを解除
-                                    </>
-                                    :
-                                    <>
-                                        <Icon
-                                            ariaLabel="Favorite"
-                                            viewBox={{ width: 24, height: 24 }}
-                                            pathData="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0
-                                            3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"
-                                            fill="lightgray"
-                                        />
-                                        &nbsp;いいね
-                                    </>
-                                }
-                                
+                            <>
+                                <Icon
+                                    ariaLabel="Favorite"
+                                    viewBox={{ width: 24, height: 24 }}
+                                    pathData="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0
+                                    3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"
+                                    fill="red"
+                                />
+                                &nbsp;いいねを解除
+                            </>
                             </Button>
+                            :
+                            ''
+                        }
+                        {
+                            user && !like_id ?
+                            <Button 
+                                variation="default" 
+                                size="Large" 
+                                isFullWidth={true}
+                                style={{ width: '180px', marginTop: '20px', borderColor: 'red' }}
+                                onClick={() => onLikeClick()}
+                            >
+                            <>
+                                <Icon
+                                    ariaLabel="Favorite"
+                                    viewBox={{ width: 24, height: 24 }}
+                                    pathData="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0
+                                    3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"
+                                    fill="lightgray"
+                                />
+                                &nbsp;いいね
+                            </>
+                            </Button>
+                            :
+                            ''
+                        }
+                        {
+                            !user ?
+                                <Button 
+                                variation="default" 
+                                size="Large" 
+                                isFullWidth={true}
+                                style={{ width: '400px', marginTop: '20px', borderColor: 'red' }}
+                                onClick={() => onLikeClick()}
+                                isDisabled={true}
+                            >「いいね」するにはログインしてください</Button>
+                            :
+                            ''
+                        }
                         </Flex>
 
                         <h3>この記事にコメントする</h3>
@@ -398,13 +439,26 @@ const PostComponent = () => {
                             onChange={(e) => setMyComment(e.target.value)}
                         />
                         <Flex justifyContent="center" style={{ marginBottom: '40px' }}>
-                            <Button 
-                                variation="primary"
-                                size="Large" 
-                                isFullWidth={true}
-                                style={{  width: '200px', marginTop: '20px', backgroundColor: 'red' }}
-                                onClick={() => onCommentClick()}
-                            >コメントする</Button>
+                            {
+                                user?
+                                <Button 
+                                    variation="primary"
+                                    size="Large" 
+                                    isFullWidth={true}
+                                    style={{  width: '200px', marginTop: '20px', backgroundColor: 'red' }}
+                                    onClick={() => onCommentClick()}
+                                >コメントする</Button>
+                                :
+                                <Button 
+                                    variation="primary"
+                                    size="Large" 
+                                    isFullWidth={true}
+                                    style={{  width: '400px', marginTop: '20px' }}
+                                    onClick={() => onCommentClick()}
+                                    isDisabled={true}
+                                >コメントするにはログインしてください</Button>
+                            }
+                            
                         </Flex>
                         {
                             comment.length > 0 ?
@@ -444,7 +498,7 @@ const PostComponent = () => {
                                         >
                                             {/* 自コメントの場合のみ「削除」表示 */}
                                             {
-                                                user.username === commentItem.user_id ?
+                                                user && user.username === commentItem.user_id ?
                                                 <Button variation="link" size="small" onClick={() => onCommentDelete(commentItem.id)}>削除</Button>
                                                 :
                                                 ''
