@@ -58,7 +58,7 @@ const Home = () => {
                             <Flex><Link key={post.id} href={`/posts/${post.id}`}>{post.title}</Link></Flex>
                             <Flex style={{ color: 'gray', fontSize: '12px' }}>{extractDateAndTimeChars(post.updatedAt)}</Flex>
                         </Flex>
-                        ))
+                    ))
                 }
                 </Flex>
             </View>

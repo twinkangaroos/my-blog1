@@ -8,6 +8,7 @@ import Header from "../Header"
 import Markdown from 'react-markdown'
 import { Comment, User, Like, LikeComment } from '../../models';
 import { useRef } from 'react';
+import { useAuthenticator } from '@aws-amplify/ui-react';
 
 const PostComponent = () => {
     const [post, setPost] = useState("")
@@ -27,22 +28,35 @@ const PostComponent = () => {
     const param_id = router.query.id
     const { tokens } = useTheme()
 
-    
+    const { user, signOut } = useAuthenticator((context) => [
+        context.user,
+        context.signOut,
+    ])
+
     // 初期ロード時の処理
     useEffect(() => {
         doInit()
         // Comment取得
         getComment()
+        // CommentLike取得
+        getCommentLike()
         
         // real time functionality
-        DataStore.observe(Post).subscribe(()  => {
-            doInit()
-        })
-        DataStore.observe(PostList).subscribe(()  => {
-            doInit()
-        })
+        //DataStore.observe(Post).subscribe(()  => {
+        //    //console.log("observe Post")
+        //    //doInit()
+        //})
+        //DataStore.observe(PostList).subscribe(()  => {
+        //    //console.log("observe PostList")
+        //    //doInit()
+        //})
         DataStore.observe(Comment).subscribe(()  => {
+            console.log("observe Comment")
             getComment()
+        })
+        DataStore.observe(LikeComment).subscribe(()  => {
+            console.log("observe LikeComment")
+            getCommentLike()
         })
     }, [param_id])
 
@@ -68,8 +82,11 @@ const PostComponent = () => {
                 console.log("Error when retrieving DB during doInit().....")
             }
 
-            // Like取得 //TODO: ユーザーID指定
-            const like_result = await DataStore.query(Like, (c) => c.user_id.eq("dummy"))
+            // 当記事に対する自分のLike有無を取得
+            const like_result = await DataStore.query(Like, (c) => c.and(c => [
+                c.post_id.eq(param_id),
+                c.user_id.eq(user.username),
+            ]))
             if (like_result && like_result.length > 0) {
                 setLikeId(like_result[0].id)
                 console.log("Success in taking Like.")
@@ -100,20 +117,26 @@ const PostComponent = () => {
                 // コメントidごとのユーザーid→ニックネームを取得
                 const commentUser = {};
                 // すべてのコメントユーザー情報を取得し終わるまで待つ
-                await Promise.all(comment_result.map(async (commentResult) => {
-                    const nickname = await getCommentUserNickname(commentResult.user_id)
-                    if (nickname) {
-                        commentUser[commentResult.id] = nickname
-                    }
+                await Promise.all(
+                    comment_result.map(async (commentResult) => {
+                        const nickname = await getCommentUserNickname(commentResult.user_id)
+                        if (nickname) {
+                            commentUser[commentResult.id] = nickname
+                        }
                 }))
                 setCommentUser(commentUser)
-                console.log("Success in taking Comment User.")
             }
             else {
                 setComment([])
                 setCommentUser([])
             }
+            console.log("Success in taking Comment User.")
+        }
+    }
 
+    // （記事に紐づく）コメントへの「いいね」リスト取得
+    async function getCommentLike() {
+        if (param_id) {
             // 現記事idに紐づくLikeCommentの件数取得
             const like_comment_result = await DataStore.query(LikeComment, (c) => c.post_id.eq(param_id))
             if (like_comment_result && like_comment_result.length > 0) {
@@ -124,24 +147,24 @@ const PostComponent = () => {
                     commentCounts[commentId] = (commentCounts[commentId] || 0) + 1; // comment_id ごとにカウントを増やす
                 });
                 setLikeCommentCounts(commentCounts)
-                console.log("Success in taking LikeComment count.")
             }
             else {
                 setLikeCommentCounts([])
             }
+            console.log("Success in taking LikeComment count.")
 
-            // 現記事id＋自分のLikeComment取得（複数） //TODO: ユーザーID指定
+            // 現記事id＋自分のLikeComment取得（複数）
             const like_my_comment_result = await DataStore.query(LikeComment, (c) => c.and(c => [
                 c.post_id.eq(param_id),
-                c.user_id.eq("dummy"), // TODO
+                c.user_id.eq(user.username),
             ]))
             if (like_my_comment_result && like_my_comment_result.length > 0) {
                 setLikeMyComment(like_my_comment_result)
-                console.log("Success in taking my LikeComment.")
             }
             else {
                 setLikeMyComment([])
             }
+            console.log("Success in taking my LikeComment.")
         }
     }
 
@@ -155,15 +178,17 @@ const PostComponent = () => {
             await DataStore.save(
                 new Comment({
                     "post_id": id,
-                    "user_id": "dummy",
+                    "user_id": user.username,
                     "comment": my_comment
                 })
             )
-            console.log("コメントが投稿されました。")
             setMyComment("")
             if (commentRef.current) {
                 commentRef.current.value = ""
             }
+            // コメント再取得
+            //getComment()
+            console.log("コメントが投稿されました。")
         }
         catch (error) {
             console.error('コメント登録時にエラーが発生しました:', error)
@@ -184,6 +209,8 @@ const PostComponent = () => {
             if (modelToDelete2) {
                 await DataStore.delete(modelToDelete2)
             }
+            // コメント再取得
+            //getComment()
             console.log("LikeComment successfully deleted.")
         }
         catch (error) {
@@ -199,7 +226,7 @@ const PostComponent = () => {
                 const newLike = await DataStore.save(
                     new Like({
                         "post_id": id,
-                        "user_id": "dummy", // TODO
+                        "user_id": user.username,
                         "like_flag": true
                     })
                 )
@@ -227,26 +254,25 @@ const PostComponent = () => {
                 await DataStore.save(
                     new LikeComment({
                         "comment_id": comment_id,
-                        "user_id": "dummy", // TODO
+                        "user_id": user.username,
                         "like_flag": true,
                         "post_id": id
                     })
                 );
-                
                 console.log("Successfully like to a comment.")
             }
             // 「いいね」している場合→削除
             else {
                 const modelToDelete = await DataStore.query(LikeComment, (c) => c.and(c => [
                     c.comment_id.eq(comment_id),
-                    c.user_id.eq("dummy"), // TODO
+                    c.user_id.eq(user.username),
                 ]))
                 console.log("model", modelToDelete[0].id)
                 await DataStore.delete(LikeComment, modelToDelete[0].id);
                 console.log("Successfully deleted like.")
             }
-            // LikeComment含め再取得
-            getComment()
+            // Likeコメント再取得
+            getCommentLike()
         }
         catch (error) {
             console.error('いいね時にエラーが発生しました:', error)
@@ -416,8 +442,13 @@ const PostComponent = () => {
                                             justifyContent="flex-end"
                                             alignItems="center"
                                         >
-                                            {/* TODO：自コメントの場合のみ「削除」表示 */}
-                                            <Button variation="link" size="small" onClick={() => onCommentDelete(commentItem.id)}>削除</Button>
+                                            {/* 自コメントの場合のみ「削除」表示 */}
+                                            {
+                                                user.username === commentItem.user_id ?
+                                                <Button variation="link" size="small" onClick={() => onCommentDelete(commentItem.id)}>削除</Button>
+                                                :
+                                                ''
+                                            }
                                             <Button variation="default" size="small">返信</Button>
                                             {/***** コメントに対するいいねボタン *****/}
                                             {

@@ -3,8 +3,9 @@ import { Heading, Flex, Link, Button } from '@aws-amplify/ui-react';
 import { useAuthenticator } from '@aws-amplify/ui-react';
 
 const HeaderAdmin = () => {
-  const { route, signOut } = useAuthenticator((context) => [
+  const { route, user, signOut } = useAuthenticator((context) => [
     context.route,
+    context.user,
     context.signOut,
   ])
 
@@ -14,7 +15,12 @@ const HeaderAdmin = () => {
         <Heading level={5}><Link href="/">Twin kangaroos</Link></Heading>
         {
           route === 'authenticated' ?
-          <Button variation="link" onClick={signOut} size="small">ログアウト</Button>
+          <Flex alignItems="baseline">
+              <Flex style={{fontSize: '12px'}}>{user.attributes.nickname} がログイン中...</Flex> 
+              <Button variation="link" onClick={signOut} size="small" style={{fontSize: '12px'}}>
+                  ログアウト
+              </Button>
+          </Flex>
           :
           ''
         }
