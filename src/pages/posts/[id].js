@@ -48,13 +48,13 @@ const PostComponent = () => {
         //})
         DataStore.observe(Comment).subscribe(()  => {
             console.log("observe Comment")
-            getComment()
+            doInit()
         })
         DataStore.observe(LikeComment).subscribe(()  => {
             console.log("observe LikeComment")
-            getCommentLike()
+            doInit()
         })
-    }, [])
+    }, [param_id])
 
     // 初期処理
     async function doInit() {
@@ -89,25 +89,7 @@ const PostComponent = () => {
                     console.log("Success in taking Like.")
                 }
             }
-            // Comment取得
-            getComment()
-            // CommentLike取得
-            getCommentLike()
-        }
-    }
 
-    // ユーザーのニックネームを取得
-    async function getCommentUserNickname(userId) {
-        const user_result = await DataStore.query(User, ((c) => c.user_id.eq(userId)))
-        if (user_result && user_result.length > 0) {
-            return user_result[0].nickname
-        }
-        return null
-    }
-
-    // （記事に紐づく）コメントリスト取得
-    async function getComment() {
-        if (param_id) {
             // 現記事idに紐づくCommentを取得
             const comment_result = await DataStore.query(Comment, (c) => c.post_id.eq(param_id), {
                 sort:(s) => s.updatedAt(SortDirection.DESCENDING),
@@ -133,12 +115,7 @@ const PostComponent = () => {
                 setCommentUser([])
             }
             console.log("Success in taking Comment User.")
-        }
-    }
-
-    // （記事に紐づく）コメントへの「いいね」リスト取得
-    async function getCommentLike() {
-        if (param_id) {
+        
             // 現記事idに紐づくLikeCommentの件数取得
             const like_comment_result = await DataStore.query(LikeComment, (c) => c.post_id.eq(param_id))
             if (like_comment_result && like_comment_result.length > 0) {
@@ -172,6 +149,27 @@ const PostComponent = () => {
         }
     }
 
+    // ユーザーのニックネームを取得
+    async function getCommentUserNickname(userId) {
+        const user_result = await DataStore.query(User, ((c) => c.user_id.eq(userId)))
+        if (user_result && user_result.length > 0) {
+            return user_result[0].nickname
+        }
+        return null
+    }
+
+    // （記事に紐づく）コメントリスト取得
+    //async function getComment() {
+    //    if (param_id) {
+    //    }
+    //}
+
+    // （記事に紐づく）コメントへの「いいね」リスト取得
+    //async function getCommentLike() {
+    //    if (param_id) {   
+    //    }
+    //}
+
     // コメントするクリック
     const onCommentClick = async () => {
         if (!my_comment) {
@@ -194,8 +192,6 @@ const PostComponent = () => {
             if (commentRef.current) {
                 commentRef.current.value = ""
             }
-            // コメント再取得
-            //getComment()
             console.log("コメントが投稿されました。")
         }
         catch (error) {
@@ -216,8 +212,6 @@ const PostComponent = () => {
             if (modelToDelete2) {
                 await DataStore.delete(modelToDelete2)
             }
-            // コメント再取得
-            //getComment()
             console.log("LikeComment successfully deleted.")
         }
         catch (error) {
@@ -287,7 +281,7 @@ const PostComponent = () => {
                 console.log("Successfully deleted like.")
             }
             // Likeコメント再取得
-            getCommentLike()
+            //getCommentLike()
         }
         catch (error) {
             console.error('いいね時にエラーが発生しました:', error)
