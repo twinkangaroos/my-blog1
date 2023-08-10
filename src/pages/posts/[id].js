@@ -15,19 +15,25 @@ const PostComponent = () => {
     const [id, setId] = useState("")
     const [my_comment, setMyComment] = useState("")
     const [comment, setComment] = useState([])
-    const [user, setUser] = useState([])
-    const commentRef = useRef(null); // コメント入力要素のrefを作成
-    const [like_id, setLikeId] = useState("")
-    const [like_my_comment, setLikeMyComment] = useState([])
-    const [like_comment_counts, setLikeCommentCounts] = useState([])
+    //const [user, setUser] = useState([])
+    const commentRef = useRef(null); // 記事に対するコメント入力要素のrefを作成
+    const [like_id, setLikeId] = useState("")   // 記事に対するいいねの有無
+    const [like_my_comment, setLikeMyComment] = useState([])    // 自分が各コメントにLikeしたか
+    const [like_comment_counts, setLikeCommentCounts] = useState([]) // コメントidごとのいいね件数
+    const [comment_user, setCommentUser] = useState([]) // コメントidごとのユーザーid
     
     // パスパラメータからidを取得
     const router = useRouter()
     const param_id = router.query.id
     const { tokens } = useTheme()
 
-    // リアルタイム表示の設定
+    
+    // 初期ロード時の処理
     useEffect(() => {
+        doInit()
+        // Comment取得
+        getComment()
+        
         // real time functionality
         DataStore.observe(Post).subscribe(()  => {
             doInit()
@@ -38,13 +44,6 @@ const PostComponent = () => {
         DataStore.observe(Comment).subscribe(()  => {
             getComment()
         })
-    }, [])
-
-    // 初期ロード時の処理
-    useEffect(() => {
-        doInit()
-        // Comment取得
-        getComment()
     }, [param_id])
 
     // 初期処理
@@ -69,13 +68,6 @@ const PostComponent = () => {
                 console.log("Error when retrieving DB during doInit().....")
             }
 
-            // User全取得　TODO：ニックネーム取得要／TODO：データ件数多い場合の対処要
-            const user_result = await DataStore.query(User)
-            if (user_result && user_result.length > 0) {
-                setUser(user_result)
-                console.log("Success in taking all User.")
-            }
-
             // Like取得 //TODO: ユーザーID指定
             const like_result = await DataStore.query(Like, (c) => c.user_id.eq("dummy"))
             if (like_result && like_result.length > 0) {
@@ -83,6 +75,15 @@ const PostComponent = () => {
                 console.log("Success in taking Like.")
             }
         }
+    }
+
+    // ユーザーのニックネームを取得
+    async function getCommentUserNickname(userId) {
+        const user_result = await DataStore.query(User, ((c) => c.user_id.eq(userId)))
+        if (user_result && user_result.length > 0) {
+            return user_result[0].nickname
+        }
+        return null
     }
 
     // （記事に紐づく）コメントリスト取得
@@ -95,6 +96,22 @@ const PostComponent = () => {
             if (comment_result && comment_result.length > 0) {
                 setComment(comment_result)
                 console.log("Success in taking Comment.")
+
+                // コメントidごとのユーザーid→ニックネームを取得
+                const commentUser = {};
+                // すべてのコメントユーザー情報を取得し終わるまで待つ
+                await Promise.all(comment_result.map(async (commentResult) => {
+                    const nickname = await getCommentUserNickname(commentResult.user_id)
+                    if (nickname) {
+                        commentUser[commentResult.id] = nickname
+                    }
+                }))
+                setCommentUser(commentUser)
+                console.log("Success in taking Comment User.")
+            }
+            else {
+                setComment([])
+                setCommentUser([])
             }
 
             // 現記事idに紐づくLikeCommentの件数取得
@@ -107,7 +124,10 @@ const PostComponent = () => {
                     commentCounts[commentId] = (commentCounts[commentId] || 0) + 1; // comment_id ごとにカウントを増やす
                 });
                 setLikeCommentCounts(commentCounts)
-                console.log("Success in taking LikeComment count.", commentCounts)
+                console.log("Success in taking LikeComment count.")
+            }
+            else {
+                setLikeCommentCounts([])
             }
 
             // 現記事id＋自分のLikeComment取得（複数） //TODO: ユーザーID指定
@@ -117,7 +137,10 @@ const PostComponent = () => {
             ]))
             if (like_my_comment_result && like_my_comment_result.length > 0) {
                 setLikeMyComment(like_my_comment_result)
-                console.log("Success in taking my LikeComment.", like_my_comment_result)
+                console.log("Success in taking my LikeComment.")
+            }
+            else {
+                setLikeMyComment([])
             }
         }
     }
@@ -147,15 +170,20 @@ const PostComponent = () => {
         }
     }
 
-    // コメント削除クリック
+    // （自分の）記事に対するコメント削除クリック
     const onCommentDelete = async (comment_id) => {
         try {
+            console.log("comment_id", comment_id)
             const modelToDelete = await DataStore.query(Comment, comment_id)
-            await DataStore.delete(modelToDelete)
+            if (modelToDelete) {
+                await DataStore.delete(modelToDelete)
+            }
             console.log("Comment successfully deleted.")
 
             const modelToDelete2 = await DataStore.query(LikeComment, comment_id)
-            await DataStore.delete(modelToDelete2)
+            if (modelToDelete2) {
+                await DataStore.delete(modelToDelete2)
+            }
             console.log("LikeComment successfully deleted.")
         }
         catch (error) {
@@ -196,7 +224,6 @@ const PostComponent = () => {
         try {
             // 「いいね」していない場合→追加
             if (!like_flag) {
-                console.log("comment_id", comment_id)
                 await DataStore.save(
                     new LikeComment({
                         "comment_id": comment_id,
@@ -205,8 +232,7 @@ const PostComponent = () => {
                         "post_id": id
                     })
                 );
-                // LikeComment含め再取得
-                getComment()
+                
                 console.log("Successfully like to a comment.")
             }
             // 「いいね」している場合→削除
@@ -217,10 +243,10 @@ const PostComponent = () => {
                 ]))
                 console.log("model", modelToDelete[0].id)
                 await DataStore.delete(LikeComment, modelToDelete[0].id);
-                // LikeComment含め再取得
-                getComment()
                 console.log("Successfully deleted like.")
             }
+            // LikeComment含め再取得
+            getComment()
         }
         catch (error) {
             console.error('いいね時にエラーが発生しました:', error)
@@ -354,8 +380,12 @@ const PostComponent = () => {
                                 onClick={() => onCommentClick()}
                             >コメントする</Button>
                         </Flex>
-
-                        <h2>この記事に関するみなさんからのコメント</h2>
+                        {
+                            comment.length > 0 ?
+                            <h2>この記事に関するみなさんからのコメント</h2>
+                            :
+                            ''
+                        }
                         <Flex direction="column">
                         {
                             comment.map((commentItem, index) => (
@@ -368,9 +398,11 @@ const PostComponent = () => {
                                         direction="column"
                                         gap={tokens.space.xs}
                                     >
+                                        {/***** 記事に対するコメント *****/}
                                         <Flex alignItems="flex-start">
                                             <Badge size="small" variation="info">
-                                                {user.find((u) => u.user_id === commentItem.user_id)?.nickname}
+                                                {/*user.find((u) => u.user_id === commentItem.user_id)?.nickname*/}
+                                                {comment_user[commentItem.id]}
                                             </Badge>
                                             <Badge size="small" variation="success">
                                                 {extractDateAndTimeChars(commentItem.updatedAt)}
