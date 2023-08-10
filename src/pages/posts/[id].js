@@ -6,7 +6,7 @@ import { useState, useEffect, use } from 'react';
 import { Card, View, Flex, useTheme, Button, TextAreaField, Badge, Heading, Text, Icon } from '@aws-amplify/ui-react';
 import Header from "../Header"
 import Markdown from 'react-markdown'
-import { Comment, User } from '../../models';
+import { Comment, User, Like } from '../../models';
 import { useRef } from 'react';
 
 const PostComponent = () => {
@@ -17,6 +17,7 @@ const PostComponent = () => {
     const [comment, setComment] = useState([])
     const [user, setUser] = useState([])
     const commentRef = useRef(null); // コメント入力要素のrefを作成
+    const [like_id, setLikeId] = useState("")
     
     // パスパラメータからidを取得
     const router = useRouter()
@@ -64,11 +65,19 @@ const PostComponent = () => {
             const user_result = await DataStore.query(User)
             if (user_result && user_result.length > 0) {
                 setUser(user_result)
-                console.log("Success in taking User.")
+                console.log("Success in taking all User.")
             }
 
             // Comment取得
             getComment()
+
+            // Like取得 //TODO: ユーザーID指定
+            const like_result = await DataStore.query(Like, (c) => c.user_id.eq("dummy"))
+            if (like_result && like_result.length > 0) {
+                console.log("like", like_result)
+                setLikeId(like_result[0].id)
+                console.log("Success in taking Like.")
+            }
         }
     }
 
@@ -114,12 +123,41 @@ const PostComponent = () => {
     // コメント削除クリック
     const onCommentDelete = async (comment_id) => {
         try {
-            const modelToDelete = await DataStore.query(Comment, comment_id);
-            await DataStore.delete(modelToDelete);
+            const modelToDelete = await DataStore.query(Comment, comment_id)
+            await DataStore.delete(modelToDelete)
             console.log("Comment successfully deleted.")
         }
         catch (error) {
             console.error('コメント削除時にエラーが発生しました:', error)
+        }
+    }
+
+    // （この記事に）いいねクリック
+    const onLikeClick = async () => {
+        try {
+            // 「いいね」していない場合→追加
+            if (!like_id) {
+                const newLike = await DataStore.save(
+                    new Like({
+                        "post_id": id,
+                        "user_id": "dummy", // TODO
+                        "like_flag": true
+                    })
+                )
+                setLikeId(newLike.id)
+                console.log("Successfully like.")
+            }
+            // 「いいね」している場合→削除
+            else {
+                const modelToDelete = await DataStore.query(Like, like_id);
+                console.log("modelToDelete", modelToDelete);
+                DataStore.delete(modelToDelete);
+                setLikeId("")
+                console.log("Successfully deleted like.")
+            }
+        }
+        catch (error) {
+            console.error('いいね時にエラーが発生しました:', error)
         }
     }
 
@@ -201,15 +239,34 @@ const PostComponent = () => {
                                 variation="default" 
                                 size="Large" 
                                 isFullWidth={true}
-                                style={{ width: '100px', marginTop: '20px', borderColor: 'red' }}
+                                style={{ width: '180px', marginTop: '20px', borderColor: 'red' }}
+                                onClick={() => onLikeClick()}
                             >
-                                <Icon
-                                    ariaLabel="Favorite"
-                                    viewBox={{ width: 24, height: 24 }}
-                                    pathData="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0
-                                    3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"
-                                />
-                                いいね
+                                {
+                                    like_id ?
+                                    <>
+                                        <Icon
+                                            ariaLabel="Favorite"
+                                            viewBox={{ width: 24, height: 24 }}
+                                            pathData="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0
+                                            3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"
+                                            fill="red"
+                                        />
+                                        &nbsp;いいねを解除
+                                    </>
+                                    :
+                                    <>
+                                        <Icon
+                                            ariaLabel="Favorite"
+                                            viewBox={{ width: 24, height: 24 }}
+                                            pathData="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0
+                                            3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"
+                                            fill="lightgray"
+                                        />
+                                        &nbsp;いいね
+                                    </>
+                                }
+                                
                             </Button>
                         </Flex>
 
