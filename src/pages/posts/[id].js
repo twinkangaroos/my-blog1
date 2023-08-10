@@ -36,10 +36,6 @@ const PostComponent = () => {
     // 初期ロード時の処理
     useEffect(() => {
         doInit()
-        // Comment取得
-        getComment()
-        // CommentLike取得
-        getCommentLike()
         
         // real time functionality
         //DataStore.observe(Post).subscribe(()  => {
@@ -93,6 +89,10 @@ const PostComponent = () => {
                     console.log("Success in taking Like.")
                 }
             }
+            // Comment取得
+            getComment()
+            // CommentLike取得
+            getCommentLike()
         }
     }
 
