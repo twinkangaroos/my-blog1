@@ -28,14 +28,8 @@ const PostDetail = () => {
     // 初期ロード時の処理
     useEffect(() => {
         doInit()
-    //}, [param_id, post_list_flag])
     }, [])
 
-    // 要素追加時
-    useEffect(() => {
-        
-    }, [focusOnNextAdd, post_list])
-    
     // 初期処理
     async function doInit() {
         if (param_id) {
@@ -85,77 +79,7 @@ const PostDetail = () => {
         <Authenticator hideSignUp={true}>
         {({ signOut, user }) => ( 
         <>
-            <View
-                backgroundColor={tokens.colors.background.secondary}
-                padding={tokens.space.medium}
-            >
-                <Flex
-                    justifyContent="flex-end"
-                    style={{
-                        paddingBottom: '20px',
-                        position: 'sticky',
-                        top: 0, // 画面上部からの位置を指定します
-                        zIndex: 1, // 必要に応じてz-indexを調整します
-                    }}
-                >
-                    <Button variation="link" size="small"><Link href="/admin/postlist">一覧に戻る</Link></Button>
-                    {
-                        post ?
-                        <Button variation="warning" onClick={onUClick} size="small">更新する</Button>
-                        :
-                        ''
-                    }
-                </Flex>
-                
-                <RadioGroupField
-                    label="記事のタイプ"
-                    name="article_type"
-                    direction="row"
-                    style={{ marginBottom: '20px' }}
-                    // TODO:
-                    defaultValue="basic"
-                >
-                    <Radio value="basic">基本タイプ</Radio>
-                    <Radio value="link">リンクタイプ</Radio>
-                </RadioGroupField>
-                <Card>
-                    <Flex direction="column" alignItems="flex-start" className="ProseMirror note-common-styles__textnote-body">
-                        {
-                            post ?
-                            <h1
-                                contentEditable
-                                style={{ border: 'none', outline: 'none', lineHeight: '1.5', width: "640px" }}
-                                dangerouslySetInnerHTML={{ __html: post && post.title ? post.title : '' }}
-                                ref={titleRef} // refをtitle要素に紐付け
-                                onKeyDown={handleKeyDownH1} // Enterキーの処理を行う
-                                placeholder="記事タイトル"
-                                className={styles.editableContentH1}
-                            />
-                            :
-                            ''
-                        }
-                        
-                         {
-                            post ?
-                            <Flex direction="row">
-                                <Button variation="default" onClick={() => handleAddElement("div")} size="small">段落の追加</Button>
-                                <Button variation="default" onClick={() => handleAddElement("h2")} size="small">h2大見出しの追加</Button>
-                                <Button variation="default" onClick={() => handleAddElement("h3")} size="small">h3小見出しの追加</Button>
-                            </Flex>
-                            :
-                            ''
-                         }
-                    </Flex>
-                    {
-                        post ?
-                        <Flex justifyContent="flex-end">
-                            <Link href="#" onClick={onDClick}>削除する</Link>
-                        </Flex>
-                        :
-                        ''
-                    }
-                </Card>
-            </View>
+            aaa
         </>
         )}
         </Authenticator>
