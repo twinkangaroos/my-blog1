@@ -29,17 +29,11 @@ const PostDetail = () => {
     useEffect(() => {
         doInit()
     //}, [param_id, post_list_flag])
-    }, [param_id])
+    }, [])
 
     // 要素追加時
     useEffect(() => {
-        if (focusOnNextAdd && divRefs.current.length > 0) {
-            // 新しく追加された要素にフォーカスを当てる
-            if (divRefs.current[divRefs.current.length - 1]) {
-                divRefs.current[divRefs.current.length - 1].focus()
-                setFocusOnNextAdd(false) // フォーカスを当てるフラグをfalseに設定
-            }
-        }
+        
     }, [focusOnNextAdd, post_list])
     
     // 初期処理
@@ -140,90 +134,7 @@ const PostDetail = () => {
                             :
                             ''
                         }
-                        {
-                            post_list.length > 0 ?
-                            post_list.map((postItem, index) => {
-                                // 上に移動ボタン
-                                const renderUpElement = (index) => {
-                                    if (index > 0) {
-                                        return (
-                                            <Button onClick={() => handleMoveUp(index)} className="amplify-button amplify-field-group__control amplify-button--default amplify-button--small">↑</Button>
-                                        )
-                                    } else {
-                                        return (
-                                            <Button isDisabled={true} className="amplify-button amplify-field-group__control amplify-button--default amplify-button--small amplify-button--disabled">↑</Button>
-                                        )
-                                    }
-                                }
-                                // 下に移動ボタン
-                                const renderDownElement = (index) => {
-                                    if (index < post_list.length - 1) {
-                                        return (
-                                            <Button onClick={() => handleMoveDown(index)} className="amplify-button amplify-field-group__control amplify-button--default amplify-button--small">↓</Button>
-                                        )
-                                    } else {
-                                        return (
-                                            <Button isDisabled={true} className="amplify-button amplify-field-group__control amplify-button--default amplify-button--small amplify-button--disabled">↓</Button>
-                                        )
-                                    }
-                                }
-                                if (postItem.type === "div") {
-                                    return (
-                                        <Flex key={index + "_head"}>
-                                            <div
-                                                key={index}
-                                                contentEditable
-                                                style={{ border: 'none', outline: 'none', lineHeight: '1.5', width: "640px"  }}
-                                                dangerouslySetInnerHTML={{ __html: contents[index] ? contents[index].replace(/\n/g, '<br />') : '' }}
-                                                ref={el => (divRefs.current[index] = el)}
-                                                onKeyDown={e => handleKeyDown(e, index)}
-                                                //onClick={() => setSelectedElementIndex(index)}
-                                            />
-                                            <Flex>
-                                                {renderUpElement(index)}
-                                                {renderDownElement(index)}
-                                            </Flex>
-                                        </Flex>
-                                    )
-                                } else if (postItem.type === "h2") {
-                                    return (
-                                        <Flex key={index + "_head"}>
-                                            <h2
-                                                key={index}
-                                                contentEditable
-                                                style={{ border: 'none', outline: 'none', lineHeight: '1.5', width: "640px"  }}
-                                                dangerouslySetInnerHTML={{ __html: contents[index] ? contents[index].replace(/\n/g, '<br />') : '' }}
-                                                ref={el => (divRefs.current[index] = el)}
-                                                onKeyDown={e => handleKeyDown(e, index)}
-                                            />
-                                            <Flex>
-                                                {renderUpElement(index)}
-                                                {renderDownElement(index)}
-                                            </Flex>
-                                        </Flex>
-                                    )
-                                } else if (postItem.type === "h3") {
-                                    return (
-                                        <Flex key={index + "_head"}>
-                                            <h3
-                                                key={index}
-                                                contentEditable
-                                                style={{ border: 'none', outline: 'none', lineHeight: '1.5', width: "640px"  }}
-                                                dangerouslySetInnerHTML={{ __html: contents[index] ? contents[index].replace(/\n/g, '<br />') : '' }}
-                                                ref={el => (divRefs.current[index] = el)}
-                                                onKeyDown={e => handleKeyDown(e, index)}
-                                            />
-                                            <Flex>
-                                                {renderUpElement(index)}
-                                                {renderDownElement(index)}
-                                            </Flex>
-                                        </Flex>
-                                    )
-                                }
-                            })
-                            :
-                            ''
-                        }
+                        
                          {
                             post ?
                             <Flex direction="row">
