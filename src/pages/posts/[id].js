@@ -60,6 +60,7 @@ const PostComponent = () => {
     async function doInit() {
         if (param_id) {
             setId(param_id)
+            /*
             // Post取得
             const post_result = await DataStore.query(Post, (c) => c.id.eq(param_id))
             if (post_result && post_result.length > 0) {
@@ -115,7 +116,8 @@ const PostComponent = () => {
                 setCommentUser([])
             }
             console.log("Success in taking Comment User.")
-        
+            
+
             // 現記事idに紐づくLikeCommentの件数取得
             const like_comment_result = await DataStore.query(LikeComment, (c) => c.post_id.eq(param_id))
             if (like_comment_result && like_comment_result.length > 0) {
@@ -147,6 +149,7 @@ const PostComponent = () => {
                 console.log("Success in taking my LikeComment.")
             }
         }
+        */
     }
 
     // ユーザーのニックネームを取得
