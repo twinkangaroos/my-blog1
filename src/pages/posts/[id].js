@@ -25,6 +25,7 @@ const PostComponent = () => {
     const [showReplyArea, setShowReplyArea] = useState([]); // 返信入力エリアの表示状態を管理する配列
     const [reply_comment, setReplyComment] = useState([])
     const replyRefArray = useRef([])
+    const [comment_reply_user, setCommentReplyUser] = useState([])
 
     const { user, signOut } = useAuthenticator((context) => [
         context.user,
@@ -100,15 +101,13 @@ const PostComponent = () => {
         const comment_result = await DataStore.query(Comment, (c) => c.post_id.eq(param_id), {
             sort:(s) => s.createdAt(SortDirection.DESCENDING),
         })
-
-        // コメント登録直後は、createdAt = null のため、コメントをリストの先頭に移動
-        const comment_sorted = comment_result.sort((a, b) => {
-            if (!a.createdAt) return -1; // a が createdAt = null の場合、a を先頭に
-            if (!b.createdAt) return 1;  // b が createdAt = null の場合、b を先頭に
-            return b.createdAt - a.createdAt; // 通常の比較
-        })
-        
-        if (comment_sorted && comment_sorted.length > 0) {
+        if (comment_result && comment_result.length > 0) {
+            // コメント登録直後は、createdAt = null のため、やむを得ず最新コメントをリストの先頭に移動
+            const comment_sorted = comment_result.sort((a, b) => {
+                if (!a.createdAt) return -1; // a が createdAt = null の場合、a を先頭に
+                if (!b.createdAt) return 1;  // b が createdAt = null の場合、b を先頭に
+                return b.createdAt - a.createdAt; // 通常の比較
+            })
             setComment(comment_sorted)
 
             // コメントidごとのユーザーid→ニックネームを取得
@@ -130,6 +129,15 @@ const PostComponent = () => {
         console.log("Success in taking Comment.")
     }
 
+    // ユーザーのニックネームを取得
+    async function getCommentUserNickname(userId) {
+        const user_result = await DataStore.query(User, ((c) => c.user_id.eq(userId)))
+        if (user_result && user_result.length > 0) {
+            return user_result[0].nickname
+        }
+        return null
+    }
+    
     // コメントに対する「いいね」取得
     async function getLikeComment() {
         // 現記事idに紐づくLikeCommentの件数取得
@@ -164,15 +172,6 @@ const PostComponent = () => {
         }
     }
 
-    // ユーザーのニックネームを取得
-    async function getCommentUserNickname(userId) {
-        const user_result = await DataStore.query(User, ((c) => c.user_id.eq(userId)))
-        if (user_result && user_result.length > 0) {
-            return user_result[0].nickname
-        }
-        return null
-    }
-
     // コメントに対する返信コメント取得
     async function getReplyComment() {
         // 現記事idに紐づくReplyCommentの件数取得
@@ -187,17 +186,30 @@ const PostComponent = () => {
                 return b.createdAt - a.createdAt; // 通常の比較
             })
             setReplyComment(reply_sorted)
+
+            // コメントidごとのユーザーid→ニックネームを取得
+            const commentReplyUser = {};
+            // すべてのコメントユーザー情報を取得し終わるまで待つ
+            await Promise.all(
+                reply_sorted.map(async (commentReplyResult) => {
+                    const nickname = await getCommentUserNickname(commentReplyResult.user_id)
+                    if (nickname) {
+                        commentReplyUser[commentReplyResult.id] = nickname
+                    }
+            }))
+            setCommentReplyUser(commentReplyUser)
             console.log("Success in taking ReplyComment.")
         }
         else {
             setReplyComment([])
+            setCommentReplyUser([])
         }
         console.log("Success in taking ReplyComment.")
     }
 
 
 
-    // コメントするクリック
+    // 「コメントする」クリック
     const onCommentClick = async () => {
         if (!my_comment) {
             alert("コメントを入力してください。")
@@ -228,7 +240,7 @@ const PostComponent = () => {
         }
     }
 
-    // （自分の）記事に対するコメント削除クリック
+    // コメント削除クリック（各コメントの中から自分のコメントのみ）
     const onCommentDelete = async (comment_id) => {
         try {
             const commentToDelete = await DataStore.query(Comment, comment_id)
@@ -237,16 +249,10 @@ const PostComponent = () => {
             }
             console.log("Comment successfully deleted.")
 
-            const likeCommentToDelete = await DataStore.query(LikeComment, comment_id)
-            if (likeCommentToDelete) {
-                await DataStore.delete(likeCommentToDelete)
-            }
+            await DataStore.delete(LikeComment, (c) => c.comment_id.eq(comment_id))
             console.log("LikeComment successfully deleted.")
 
-            const commentReplyToDelete = await DataStore.query(CommentReply, comment_id)
-            if (commentReplyToDelete) {
-                await DataStore.delete(commentReplyToDelete)
-            }
+            await DataStore.delete(CommentReply, (c) => c.comment_id.eq(comment_id))
             console.log("CommentReply successfully deleted.")
             
             // コメント再取得
@@ -257,7 +263,7 @@ const PostComponent = () => {
         }
     }
 
-    // （この記事に）いいねクリック
+    // いいねクリック（当記事に）
     const onLikeClick = async () => {
         try {
             if (!user) {
@@ -289,7 +295,7 @@ const PostComponent = () => {
         }
     }
 
-    // （コメントに）いいねクリック
+    // いいねクリック（各コメントに）
     const onLikeCommentClick = async (comment_id, like_flag) => {
         console.log("comment_id", comment_id)
         console.log("like_flag", like_flag)
@@ -336,7 +342,7 @@ const PostComponent = () => {
     }
 
     
-    // 返信ボタンクリック時
+    // 返信ボタンクリック時(各コメントに）
     const onReplyClick = async (commentId, index) => {
         const replyText = replyRefArray.current[index].value
         
@@ -668,7 +674,7 @@ const PostComponent = () => {
                                                 <Flex alignItems="flex-start">
                                                     {/***** ニックネーム *****/}
                                                     <Badge size="small" variation="info">
-                                                        {replyItem.user_id}
+                                                    {comment_reply_user[replyItem.id]}
                                                     </Badge>
                                                     {/***** 更新日時 *****/}
                                                     {
