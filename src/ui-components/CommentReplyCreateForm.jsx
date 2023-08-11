@@ -25,25 +25,27 @@ export default function CommentReplyCreateForm(props) {
   const initialValues = {
     comment_id: "",
     user_id: "",
-    comment: "",
+    comment_body: "",
     post_id: "",
   };
   const [comment_id, setComment_id] = React.useState(initialValues.comment_id);
   const [user_id, setUser_id] = React.useState(initialValues.user_id);
-  const [comment, setComment] = React.useState(initialValues.comment);
+  const [comment_body, setComment_body] = React.useState(
+    initialValues.comment_body
+  );
   const [post_id, setPost_id] = React.useState(initialValues.post_id);
   const [errors, setErrors] = React.useState({});
   const resetStateValues = () => {
     setComment_id(initialValues.comment_id);
     setUser_id(initialValues.user_id);
-    setComment(initialValues.comment);
+    setComment_body(initialValues.comment_body);
     setPost_id(initialValues.post_id);
     setErrors({});
   };
   const validations = {
     comment_id: [],
     user_id: [],
-    comment: [],
+    comment_body: [],
     post_id: [],
   };
   const runValidationTasks = async (
@@ -73,7 +75,7 @@ export default function CommentReplyCreateForm(props) {
         let modelFields = {
           comment_id,
           user_id,
-          comment,
+          comment_body,
           post_id,
         };
         const validationResponses = await Promise.all(
@@ -131,7 +133,7 @@ export default function CommentReplyCreateForm(props) {
             const modelFields = {
               comment_id: value,
               user_id,
-              comment,
+              comment_body,
               post_id,
             };
             const result = onChange(modelFields);
@@ -158,7 +160,7 @@ export default function CommentReplyCreateForm(props) {
             const modelFields = {
               comment_id,
               user_id: value,
-              comment,
+              comment_body,
               post_id,
             };
             const result = onChange(modelFields);
@@ -175,31 +177,31 @@ export default function CommentReplyCreateForm(props) {
         {...getOverrideProps(overrides, "user_id")}
       ></TextField>
       <TextField
-        label="Comment"
+        label="Comment body"
         isRequired={false}
         isReadOnly={false}
-        value={comment}
+        value={comment_body}
         onChange={(e) => {
           let { value } = e.target;
           if (onChange) {
             const modelFields = {
               comment_id,
               user_id,
-              comment: value,
+              comment_body: value,
               post_id,
             };
             const result = onChange(modelFields);
-            value = result?.comment ?? value;
+            value = result?.comment_body ?? value;
           }
-          if (errors.comment?.hasError) {
-            runValidationTasks("comment", value);
+          if (errors.comment_body?.hasError) {
+            runValidationTasks("comment_body", value);
           }
-          setComment(value);
+          setComment_body(value);
         }}
-        onBlur={() => runValidationTasks("comment", comment)}
-        errorMessage={errors.comment?.errorMessage}
-        hasError={errors.comment?.hasError}
-        {...getOverrideProps(overrides, "comment")}
+        onBlur={() => runValidationTasks("comment_body", comment_body)}
+        errorMessage={errors.comment_body?.errorMessage}
+        hasError={errors.comment_body?.hasError}
+        {...getOverrideProps(overrides, "comment_body")}
       ></TextField>
       <TextField
         label="Post id"
@@ -212,7 +214,7 @@ export default function CommentReplyCreateForm(props) {
             const modelFields = {
               comment_id,
               user_id,
-              comment,
+              comment_body,
               post_id: value,
             };
             const result = onChange(modelFields);

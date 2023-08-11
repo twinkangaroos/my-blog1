@@ -17,7 +17,7 @@ type CommentReply @model @auth(rules: [{allow: public}]) {
   id: ID!
   comment_id: String
   user_id: String
-  comment: String
+  comment_body: String
   post_id: String
 }
 

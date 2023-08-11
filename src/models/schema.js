@@ -177,8 +177,8 @@ export const schema = {
                     "isRequired": false,
                     "attributes": []
                 },
-                "comment": {
-                    "name": "comment",
+                "comment_body": {
+                    "name": "comment_body",
                     "isArray": false,
                     "type": "String",
                     "isRequired": false,
@@ -543,5 +543,5 @@ export const schema = {
     "enums": {},
     "nonModels": {},
     "codegenVersion": "3.3.5",
-    "version": "b29c1f843d82b801409aacc074fc6582"
+    "version": "ef5b0999bea8492697b79c2b233780be"
 };

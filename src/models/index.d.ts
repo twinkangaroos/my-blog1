@@ -80,7 +80,7 @@ type EagerCommentReply = {
   readonly id: string;
   readonly comment_id?: string | null;
   readonly user_id?: string | null;
-  readonly comment?: string | null;
+  readonly comment_body?: string | null;
   readonly post_id?: string | null;
   readonly createdAt?: string | null;
   readonly updatedAt?: string | null;
@@ -94,7 +94,7 @@ type LazyCommentReply = {
   readonly id: string;
   readonly comment_id?: string | null;
   readonly user_id?: string | null;
-  readonly comment?: string | null;
+  readonly comment_body?: string | null;
   readonly post_id?: string | null;
   readonly createdAt?: string | null;
   readonly updatedAt?: string | null;
