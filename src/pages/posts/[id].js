@@ -15,7 +15,7 @@ const PostComponent = () => {
     const [post_list, setPostList] = useState([])
     const [id, setId] = useState("")
     const [my_comment, setMyComment] = useState("")
-    const [comment, setComment] = useState([])
+    const [comment_list, setCommentList] = useState([])
     //const [user, setUser] = useState([])
     const commentRef = useRef(null); // 記事に対するコメント入力要素のrefを作成
     const [like_id, setLikeId] = useState("")   // 記事に対するいいねの有無
@@ -60,7 +60,7 @@ const PostComponent = () => {
     async function doInit() {
         if (param_id) {
             setId(param_id)
-            /*
+            
             // Post取得
             const post_result = await DataStore.query(Post, (c) => c.id.eq(param_id))
             if (post_result && post_result.length > 0) {
@@ -96,7 +96,7 @@ const PostComponent = () => {
                 sort:(s) => s.updatedAt(SortDirection.DESCENDING),
             })
             if (comment_result && comment_result.length > 0) {
-                setComment(comment_result)
+                setCommentList(comment_result)
                 console.log("Success in taking Comment.")
 
                 // コメントidごとのユーザーid→ニックネームを取得
@@ -112,7 +112,7 @@ const PostComponent = () => {
                 setCommentUser(commentUser)
             }
             else {
-                setComment([])
+                setCommentList([])
                 setCommentUser([])
             }
             console.log("Success in taking Comment User.")
@@ -149,7 +149,6 @@ const PostComponent = () => {
                 console.log("Success in taking my LikeComment.")
             }
         }
-        */
     }
 
     // ユーザーのニックネームを取得
@@ -458,14 +457,14 @@ const PostComponent = () => {
                             
                         </Flex>
                         {
-                            comment.length > 0 ?
+                            comment_list.length > 0 ?
                             <h2>この記事に関するみなさんからのコメント</h2>
                             :
                             ''
                         }
                         <Flex direction="column">
                         {
-                            comment.map((commentItem, index) => (
+                            comment_list.map((commentItem, index) => (
                                 <Card 
                                     key={commentItem.id} 
                                     variation="outlined" 
