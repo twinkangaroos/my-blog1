@@ -146,7 +146,7 @@ type EagerComment = {
   readonly id: string;
   readonly post_id?: string | null;
   readonly user_id?: string | null;
-  readonly comment?: string | null;
+  readonly comment_body?: string | null;
   readonly createdAt?: string | null;
   readonly updatedAt?: string | null;
 }
@@ -159,7 +159,7 @@ type LazyComment = {
   readonly id: string;
   readonly post_id?: string | null;
   readonly user_id?: string | null;
-  readonly comment?: string | null;
+  readonly comment_body?: string | null;
   readonly createdAt?: string | null;
   readonly updatedAt?: string | null;
 }

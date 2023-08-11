@@ -32,7 +32,7 @@ type Comment @model @auth(rules: [{allow: public}]) {
   id: ID!
   post_id: String
   user_id: String
-  comment: String
+  comment_body: String
 }
 
 type PostList @model @auth(rules: [{allow: public}]) {

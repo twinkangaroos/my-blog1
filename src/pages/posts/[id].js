@@ -185,7 +185,7 @@ const PostComponent = () => {
                 new Comment({
                     "post_id": id,
                     "user_id": user.username,
-                    "comment": my_comment
+                    "comment_body": my_comment
                 })
             )
             setMyComment("")
@@ -483,7 +483,7 @@ const PostComponent = () => {
                                             </Badge>
                                         </Flex>
                                         <Text as="span">
-                                            {commentItem.comment}
+                                            {commentItem.comment_body}
                                         </Text>
                                         <Flex 
                                             direction="row" 
