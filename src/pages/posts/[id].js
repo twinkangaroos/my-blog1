@@ -37,6 +37,98 @@ const PostComponent = () => {
     useEffect(() => {
         doInit()
         
+        // 初期処理
+        async function doInit() {
+            if (param_id) {
+                setId(param_id)
+                // Post取得
+                const post_result = await DataStore.query(Post, (c) => c.id.eq(param_id))
+                if (post_result && post_result.length > 0) {
+                    setPost(post_result[0])
+                    console.log("Success in taking Post.")
+
+                    // PostList取得
+                    const post_list_result = await DataStore.query(PostList, (c) => c.post_id.eq(param_id), {
+                        sort:(s) => s.sort(SortDirection.ASCENDING),
+                    })
+                    if (post_list_result && post_list_result.length > 0) {
+                        setPostList(post_list_result)
+                        console.log("Success in taking PostList.")
+                    }
+                } else {
+                    console.log("Error when retrieving DB during doInit().....")
+                }
+
+                // 当記事に対する自分のLike有無を取得
+                if (user) {
+                    const like_result = await DataStore.query(Like, (c) => c.and(c => [
+                        c.post_id.eq(param_id),
+                        c.user_id.eq(user.username),
+                    ]))
+                    if (like_result && like_result.length > 0) {
+                        setLikeId(like_result[0].id)
+                        console.log("Success in taking Like.")
+                    }
+                }
+
+                // 現記事idに紐づくCommentを取得
+                const comment_result = await DataStore.query(Comment, (c) => c.post_id.eq(param_id), {
+                    sort:(s) => s.updatedAt(SortDirection.DESCENDING),
+                })
+                if (comment_result && comment_result.length > 0) {
+                    setComment(comment_result)
+                    console.log("Success in taking Comment.")
+
+                    // コメントidごとのユーザーid→ニックネームを取得
+                    const commentUser = {};
+                    // すべてのコメントユーザー情報を取得し終わるまで待つ
+                    await Promise.all(
+                        comment_result.map(async (commentResult) => {
+                            const nickname = await getCommentUserNickname(commentResult.user_id)
+                            if (nickname) {
+                                commentUser[commentResult.id] = nickname
+                            }
+                    }))
+                    setCommentUser(commentUser)
+                }
+                else {
+                    setComment([])
+                    setCommentUser([])
+                }
+                console.log("Success in taking Comment User.")
+            
+                // 現記事idに紐づくLikeCommentの件数取得
+                const like_comment_result = await DataStore.query(LikeComment, (c) => c.post_id.eq(param_id))
+                if (like_comment_result && like_comment_result.length > 0) {
+                    // 件数カウント
+                    const commentCounts = {}; // オブジェクトを作成して各 comment_id の件数を管理
+                    like_comment_result.forEach(likeComment => {
+                        const commentId = likeComment.comment_id;
+                        commentCounts[commentId] = (commentCounts[commentId] || 0) + 1; // comment_id ごとにカウントを増やす
+                    });
+                    setLikeCommentCounts(commentCounts)
+                }
+                else {
+                    setLikeCommentCounts([])
+                }
+                console.log("Success in taking LikeComment count.")
+
+                // 現記事id＋自分のLikeComment取得（複数）
+                if (user) {
+                    const like_my_comment_result = await DataStore.query(LikeComment, (c) => c.and(c => [
+                        c.post_id.eq(param_id),
+                        c.user_id.eq(user.username),
+                    ]))
+                    if (like_my_comment_result && like_my_comment_result.length > 0) {
+                        setLikeMyComment(like_my_comment_result)
+                    }
+                    else {
+                        setLikeMyComment([])
+                    }
+                    console.log("Success in taking my LikeComment.")
+                }
+            }
+        }
         // real time functionality
         //DataStore.observe(Post).subscribe(()  => {
         //    //console.log("observe Post")
@@ -56,99 +148,7 @@ const PostComponent = () => {
         })
     }, [param_id])
 
-    // 初期処理
-    async function doInit() {
-        if (param_id) {
-            setId(param_id)
-            // Post取得
-            const post_result = await DataStore.query(Post, (c) => c.id.eq(param_id))
-            if (post_result && post_result.length > 0) {
-                setPost(post_result[0])
-                console.log("Success in taking Post.")
-
-                // PostList取得
-                const post_list_result = await DataStore.query(PostList, (c) => c.post_id.eq(param_id), {
-                    sort:(s) => s.sort(SortDirection.ASCENDING),
-                })
-                if (post_list_result && post_list_result.length > 0) {
-                    setPostList(post_list_result)
-                    console.log("Success in taking PostList.")
-                }
-            } else {
-                console.log("Error when retrieving DB during doInit().....")
-            }
-
-            // 当記事に対する自分のLike有無を取得
-            if (user) {
-                const like_result = await DataStore.query(Like, (c) => c.and(c => [
-                    c.post_id.eq(param_id),
-                    c.user_id.eq(user.username),
-                ]))
-                if (like_result && like_result.length > 0) {
-                    setLikeId(like_result[0].id)
-                    console.log("Success in taking Like.")
-                }
-            }
-
-            // 現記事idに紐づくCommentを取得
-            const comment_result = await DataStore.query(Comment, (c) => c.post_id.eq(param_id), {
-                sort:(s) => s.updatedAt(SortDirection.DESCENDING),
-            })
-            if (comment_result && comment_result.length > 0) {
-                setComment(comment_result)
-                console.log("Success in taking Comment.")
-
-                // コメントidごとのユーザーid→ニックネームを取得
-                const commentUser = {};
-                // すべてのコメントユーザー情報を取得し終わるまで待つ
-                await Promise.all(
-                    comment_result.map(async (commentResult) => {
-                        const nickname = await getCommentUserNickname(commentResult.user_id)
-                        if (nickname) {
-                            commentUser[commentResult.id] = nickname
-                        }
-                }))
-                setCommentUser(commentUser)
-            }
-            else {
-                setComment([])
-                setCommentUser([])
-            }
-            console.log("Success in taking Comment User.")
-        
-            // 現記事idに紐づくLikeCommentの件数取得
-            const like_comment_result = await DataStore.query(LikeComment, (c) => c.post_id.eq(param_id))
-            if (like_comment_result && like_comment_result.length > 0) {
-                // 件数カウント
-                const commentCounts = {}; // オブジェクトを作成して各 comment_id の件数を管理
-                like_comment_result.forEach(likeComment => {
-                    const commentId = likeComment.comment_id;
-                    commentCounts[commentId] = (commentCounts[commentId] || 0) + 1; // comment_id ごとにカウントを増やす
-                });
-                setLikeCommentCounts(commentCounts)
-            }
-            else {
-                setLikeCommentCounts([])
-            }
-            console.log("Success in taking LikeComment count.")
-
-            // 現記事id＋自分のLikeComment取得（複数）
-            if (user) {
-                const like_my_comment_result = await DataStore.query(LikeComment, (c) => c.and(c => [
-                    c.post_id.eq(param_id),
-                    c.user_id.eq(user.username),
-                ]))
-                if (like_my_comment_result && like_my_comment_result.length > 0) {
-                    setLikeMyComment(like_my_comment_result)
-                }
-                else {
-                    setLikeMyComment([])
-                }
-                console.log("Success in taking my LikeComment.")
-            }
-        }
-    }
-
+    
     // ユーザーのニックネームを取得
     async function getCommentUserNickname(userId) {
         const user_result = await DataStore.query(User, ((c) => c.user_id.eq(userId)))

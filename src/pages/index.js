@@ -22,10 +22,10 @@ const Home = () => {
     useEffect(() => {
         fetchPosts();
         async function fetchPosts() {
-        const postData = await DataStore.query(Post, Predicates.ALL, {
-            sort:(s) => s.createdAt(SortDirection.DESCENDING),
-        })
-        setPosts(postData);
+            const postData = await DataStore.query(Post, Predicates.ALL, {
+                sort:(s) => s.createdAt(SortDirection.DESCENDING),
+            })
+            setPosts(postData);
         }
         // real time functionality
         DataStore.observe(Post).subscribe(()  => {
