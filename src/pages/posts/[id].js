@@ -597,7 +597,13 @@ const PostComponent = () => {
                                                 ''
                                             }
                                             {/***** 返信ボタン *****/}
-                                            <Button variation="default" size="small" onClick={() => toggleReplyArea(index)}>返信</Button>
+                                            {
+                                                user ?
+                                                <Button variation="default" size="small" onClick={() => toggleReplyArea(index)}>返信</Button>
+                                                :
+                                                <Button variation="default" size="small" disabled={true}>返信するにはログインしてください</Button>
+                                            }
+                                            
                                             {/***** （みなさんの）コメントに対するいいねボタン *****/}
                                             {
                                                 like_my_comment.find((lmc) => lmc.comment_id === commentItem.id) ?
