@@ -5,7 +5,7 @@ import { Post, PostList } from '../../models';
 import { useState, useEffect, use } from 'react';
 import { Card, View, Flex, useTheme, Button, TextAreaField, Badge, Heading, Text, Icon } from '@aws-amplify/ui-react';
 import Header from "../Header"
-import Markdown from 'react-markdown'
+import ReactMarkdown from 'react-markdown'
 import { Comment, User, Like, LikeComment, CommentReply } from '../../models';
 import { useRef } from 'react';
 import { useAuthenticator } from '@aws-amplify/ui-react';
