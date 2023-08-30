@@ -19,7 +19,7 @@ const Login = () => {
     return (
         <>
             <Header />
-            <Authenticator hideSignUp={false} signUpAttributes={['email', 'nickname']}>
+            <Authenticator hideSignUp={true} signUpAttributes={['email', 'nickname']}>
             {({ signOut, user }) => ( 
                 <>
                     <Loader />
