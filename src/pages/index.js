@@ -7,7 +7,7 @@ import { Inter } from 'next/font/google'
 import { View, Flex, useTheme } from '@aws-amplify/ui-react';
 const inter = Inter({ subsets: ['latin'] });
 import Header from "./Header"
-import { useAuthenticator } from '@aws-amplify/ui-react';
+import { Authenticator, useAuthenticator } from '@aws-amplify/ui-react';
 
 const Home = () => {
     const [posts, setPosts] = useState([])
@@ -44,24 +44,30 @@ const Home = () => {
     return (
         <>
             <Header />
-            <View
-                    backgroundColor={tokens.colors.background.secondary}
-                    padding={tokens.space.medium}
-            >
-                <Flex>
-                    <h2>記事一覧</h2>
-                </Flex>
-                <Flex direction="column">
-                {
-                    posts.map(post => (
-                        <Flex direction="column" key={post.id}>
-                            <Flex><Link key={post.id} href={`/posts/${post.id}`}>{post.title}</Link></Flex>
-                            <Flex style={{ color: 'gray', fontSize: '12px' }}>{extractDateAndTimeChars(post.updatedAt)}</Flex>
+            <Authenticator hideSignUp={true} signUpAttributes={['email', 'nickname']}>
+            {({ signOut, user }) => ( 
+                <>
+                    <View
+                            backgroundColor={tokens.colors.background.secondary}
+                            padding={tokens.space.medium}
+                    >
+                        <Flex>
+                            <h2>記事一覧</h2>
                         </Flex>
-                    ))
-                }
-                </Flex>
-            </View>
+                        <Flex direction="column">
+                        {
+                            posts.map(post => (
+                                <Flex direction="column" key={post.id}>
+                                    <Flex><Link key={post.id} href={`/posts/${post.id}`}>{post.title}</Link></Flex>
+                                    <Flex style={{ color: 'gray', fontSize: '12px' }}>{extractDateAndTimeChars(post.updatedAt)}</Flex>
+                                </Flex>
+                            ))
+                        }
+                        </Flex>
+                    </View>
+                </>
+            )}
+            </Authenticator>
         </>
     )
 }
