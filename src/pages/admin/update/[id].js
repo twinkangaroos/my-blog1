@@ -25,6 +25,31 @@ const PostDetail = () => {
     const param_id = router.query.id
     const { tokens } = useTheme()
 
+    useEffect(() => {
+        // publicのJSを読み込み
+        const script1 = document.createElement('script');
+        script1.type = 'text/javascript';
+        script1.src = '/js/script_4.js';
+        document.head.appendChild(script1);
+
+        const script2 = document.createElement('script');
+        script2.type = 'text/javascript';
+        script2.src = '/js/script_117.js';
+        document.head.appendChild(script2);
+
+        const script3 = document.createElement('script');
+        script3.type = 'text/javascript';
+        script3.src = '/js/script_127.js';
+        document.head.appendChild(script3);
+
+        return () => {
+            // コンポーネントがアンマウントされた際のクリーンアップ処理
+            document.head.removeChild(script1);
+            document.head.removeChild(script2);
+            document.head.removeChild(script3);
+        };
+    }, []);
+
     // 初期ロード時の処理
     useEffect(() => {
         doInit()
@@ -271,15 +296,15 @@ const PostDetail = () => {
                         zIndex: 1, // 必要に応じてz-indexを調整します
                     }}
                 >
-                    <Button variation="link" size="small"><Link href="/admin/postlist">一覧に戻る</Link></Button>
+                    <Button variation="link" size="large"><Link href="/admin/postlist">一覧に戻る</Link></Button>
                     {
                         post ?
-                        <Button variation="warning" onClick={onUClick} size="small">更新する</Button>
+                        <Button variation="warning" onClick={onUClick} size="large">更新する</Button>
                         :
                         ''
                     }
                 </Flex>
-                
+                {/*
                 <RadioGroupField
                     label="記事のタイプ"
                     name="article_type"
@@ -291,125 +316,149 @@ const PostDetail = () => {
                     <Radio value="basic">基本タイプ</Radio>
                     <Radio value="link">リンクタイプ</Radio>
                 </RadioGroupField>
+                */}
+                <div className="c-breadcrumbsSet01">
+                    <div className="l-contentsWidth">
+                        <div className="l-mqWrapper">
+                            <ol>
+                                <li><a href="/index.html"><span>with Glico</span></a></li>
+                                <li><a href="/cafe/index.html"><span>おしゃべりカフェ</span></a></li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+                <div className="c-pageTitleSet01 type03">
+                    <div className="bgArea" style={{ backgroundImage: `url('/image/cafe_page_title01.png')` }}></div>
+                    <div className="bgAreaSp" style={{ backgroundImage: `url('/image/cafe_page_title01_sp.png')` }}></div>
+                    <div className="titleArea">
+                        <h1 className="m-pageTitle01"><span className="is-large">おしゃべりカフェ</span><span className="is-small">Talking
+                            Cafe</span><span className="townImage is-right"
+                                style={{ backgroundImage: `url('/image/cafe_town01.png')` }}></span>
+                        </h1>
+                    </div>
+                </div>
+
                 <Card>
-                    <Flex direction="column" alignItems="flex-start" className="ProseMirror note-common-styles__textnote-body">
-                        {
-                            post ?
-                            <h1
-                                contentEditable
-                                style={{ border: 'none', outline: 'none', lineHeight: '1.5', width: "640px" }}
-                                dangerouslySetInnerHTML={{ __html: post && post.title ? post.title : '' }}
-                                ref={titleRef} // refをtitle要素に紐付け
-                                onKeyDown={handleKeyDownH1} // Enterキーの処理を行う
-                                placeholder="記事タイトル"
-                                className={styles.editableContentH1}
-                            />
-                            :
-                            ''
-                        }
-                        {
-                            post_list.length > 0 ?
-                            post_list.map((postItem, index) => {
-                                // 上に移動ボタン
-                                const renderUpElement = (index) => {
-                                    if (index > 0) {
+                    <Flex direction="column" className='l-smallContentsWidth'>
+                        <Flex direction="column" alignItems="flex-start" className="ProseMirror note-common-styles__textnote-body">
+                            {
+                                post ?
+                                <h1
+                                    contentEditable
+                                    style={{ border: 'none', outline: 'none', lineHeight: '1.5', width: "100%" }}
+                                    dangerouslySetInnerHTML={{ __html: post && post.title ? post.title : '' }}
+                                    ref={titleRef} // refをtitle要素に紐付け
+                                    onKeyDown={handleKeyDownH1} // Enterキーの処理を行う
+                                    placeholder="記事タイトル"
+                                    className='m-bgTitle01'
+                                />
+                                :
+                                ''
+                            }
+                            {
+                                post_list.length > 0 ?
+                                post_list.map((postItem, index) => {
+                                    // 上に移動ボタン
+                                    const renderUpElement = (index) => {
+                                        if (index > 0) {
+                                            return (
+                                                <Button onClick={() => handleMoveUp(index)} className="amplify-button amplify-field-group__control amplify-button--default amplify-button--small">↑</Button>
+                                            )
+                                        } else {
+                                            return (
+                                                <Button isDisabled={true} className="amplify-button amplify-field-group__control amplify-button--default amplify-button--small amplify-button--disabled">↑</Button>
+                                            )
+                                        }
+                                    }
+                                    // 下に移動ボタン
+                                    const renderDownElement = (index) => {
+                                        if (index < post_list.length - 1) {
+                                            return (
+                                                <Button onClick={() => handleMoveDown(index)} className="amplify-button amplify-field-group__control amplify-button--default amplify-button--small">↓</Button>
+                                            )
+                                        } else {
+                                            return (
+                                                <Button isDisabled={true} className="amplify-button amplify-field-group__control amplify-button--default amplify-button--small amplify-button--disabled">↓</Button>
+                                            )
+                                        }
+                                    }
+                                    if (postItem.type === "div") {
                                         return (
-                                            <Button onClick={() => handleMoveUp(index)} className="amplify-button amplify-field-group__control amplify-button--default amplify-button--small">↑</Button>
+                                            <Flex key={index + "_head"} direction="row" width={'100%'}>
+                                                <div
+                                                    key={index}
+                                                    contentEditable
+                                                    style={{ border: 'none', outline: 'none', lineHeight: '1.5', width: '100%' }}
+                                                    dangerouslySetInnerHTML={{ __html: contents[index] ? contents[index].replace(/\n/g, '<br />') : '' }}
+                                                    ref={el => (divRefs.current[index] = el)}
+                                                    onKeyDown={e => handleKeyDown(e, index)}
+                                                    //onClick={() => setSelectedElementIndex(index)}
+                                                />
+                                                <Flex>
+                                                    {renderUpElement(index)}
+                                                    {renderDownElement(index)}
+                                                </Flex>
+                                            </Flex>
                                         )
-                                    } else {
+                                    } else if (postItem.type === "h2") {
                                         return (
-                                            <Button isDisabled={true} className="amplify-button amplify-field-group__control amplify-button--default amplify-button--small amplify-button--disabled">↑</Button>
+                                            <Flex key={index + "_head"} direction="row" width={'100%'}>
+                                                <h2
+                                                    key={index}
+                                                    contentEditable
+                                                    style={{ border: 'none', outline: 'none', lineHeight: '1.5', width: '100%' }}
+                                                    dangerouslySetInnerHTML={{ __html: contents[index] ? contents[index].replace(/\n/g, '<br />') : '' }}
+                                                    ref={el => (divRefs.current[index] = el)}
+                                                    onKeyDown={e => handleKeyDown(e, index)}
+                                                />
+                                                <Flex>
+                                                    {renderUpElement(index)}
+                                                    {renderDownElement(index)}
+                                                </Flex>
+                                            </Flex>
+                                        )
+                                    } else if (postItem.type === "h3") {
+                                        return (
+                                            <Flex key={index + "_head"} direction="row" width={'100%'}>
+                                                <h3
+                                                    key={index}
+                                                    contentEditable
+                                                    style={{ border: 'none', outline: 'none', lineHeight: '1.5', width: '100%' }}
+                                                    dangerouslySetInnerHTML={{ __html: contents[index] ? contents[index].replace(/\n/g, '<br />') : '' }}
+                                                    ref={el => (divRefs.current[index] = el)}
+                                                    onKeyDown={e => handleKeyDown(e, index)}
+                                                />
+                                                <Flex>
+                                                    {renderUpElement(index)}
+                                                    {renderDownElement(index)}
+                                                </Flex>
+                                            </Flex>
                                         )
                                     }
-                                }
-                                // 下に移動ボタン
-                                const renderDownElement = (index) => {
-                                    if (index < post_list.length - 1) {
-                                        return (
-                                            <Button onClick={() => handleMoveDown(index)} className="amplify-button amplify-field-group__control amplify-button--default amplify-button--small">↓</Button>
-                                        )
-                                    } else {
-                                        return (
-                                            <Button isDisabled={true} className="amplify-button amplify-field-group__control amplify-button--default amplify-button--small amplify-button--disabled">↓</Button>
-                                        )
-                                    }
-                                }
-                                if (postItem.type === "div") {
-                                    return (
-                                        <Flex key={index + "_head"}>
-                                            <div
-                                                key={index}
-                                                contentEditable
-                                                style={{ border: 'none', outline: 'none', lineHeight: '1.5', width: "640px"  }}
-                                                dangerouslySetInnerHTML={{ __html: contents[index] ? contents[index].replace(/\n/g, '<br />') : '' }}
-                                                ref={el => (divRefs.current[index] = el)}
-                                                onKeyDown={e => handleKeyDown(e, index)}
-                                                //onClick={() => setSelectedElementIndex(index)}
-                                            />
-                                            <Flex>
-                                                {renderUpElement(index)}
-                                                {renderDownElement(index)}
-                                            </Flex>
-                                        </Flex>
-                                    )
-                                } else if (postItem.type === "h2") {
-                                    return (
-                                        <Flex key={index + "_head"}>
-                                            <h2
-                                                key={index}
-                                                contentEditable
-                                                style={{ border: 'none', outline: 'none', lineHeight: '1.5', width: "640px"  }}
-                                                dangerouslySetInnerHTML={{ __html: contents[index] ? contents[index].replace(/\n/g, '<br />') : '' }}
-                                                ref={el => (divRefs.current[index] = el)}
-                                                onKeyDown={e => handleKeyDown(e, index)}
-                                            />
-                                            <Flex>
-                                                {renderUpElement(index)}
-                                                {renderDownElement(index)}
-                                            </Flex>
-                                        </Flex>
-                                    )
-                                } else if (postItem.type === "h3") {
-                                    return (
-                                        <Flex key={index + "_head"}>
-                                            <h3
-                                                key={index}
-                                                contentEditable
-                                                style={{ border: 'none', outline: 'none', lineHeight: '1.5', width: "640px"  }}
-                                                dangerouslySetInnerHTML={{ __html: contents[index] ? contents[index].replace(/\n/g, '<br />') : '' }}
-                                                ref={el => (divRefs.current[index] = el)}
-                                                onKeyDown={e => handleKeyDown(e, index)}
-                                            />
-                                            <Flex>
-                                                {renderUpElement(index)}
-                                                {renderDownElement(index)}
-                                            </Flex>
-                                        </Flex>
-                                    )
-                                }
-                            })
-                            :
-                            ''
-                        }
-                         {
+                                })
+                                :
+                                ''
+                            }
+                            {
+                                post ?
+                                <Flex direction="row" alignItems="flex-end" style={{ marginTop: '20px' }}>
+                                    <Button variation="default" onClick={() => handleAddElement("h2")} size="large" style={{height: '50px', fontWeight: 'bold'}}>大見出しの追加</Button>
+                                    <Button variation="default" onClick={() => handleAddElement("h3")} size="large" style={{height: '40px'}}>小見出しの追加</Button>
+                                    <Button variation="default" onClick={() => handleAddElement("div")} size="large" style={{height: '30px'}}>段落の追加</Button>
+                                </Flex>
+                                :
+                                ''
+                            }
+                        </Flex>
+                        {
                             post ?
-                            <Flex direction="row">
-                                <Button variation="default" onClick={() => handleAddElement("div")} size="small">段落の追加</Button>
-                                <Button variation="default" onClick={() => handleAddElement("h2")} size="small">h2大見出しの追加</Button>
-                                <Button variation="default" onClick={() => handleAddElement("h3")} size="small">h3小見出しの追加</Button>
+                            <Flex justifyContent="flex-end" style={{ fontSize: '12px' }}>
+                                <Link href="#" onClick={onDClick}>記事を削除する</Link>
                             </Flex>
                             :
                             ''
-                         }
+                        }
                     </Flex>
-                    {
-                        post ?
-                        <Flex justifyContent="flex-end">
-                            <Link href="#" onClick={onDClick}>削除する</Link>
-                        </Flex>
-                        :
-                        ''
-                    }
                 </Card>
             </View>
         </>

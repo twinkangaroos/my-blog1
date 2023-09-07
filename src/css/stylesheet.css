@@ -1,5 +1,6 @@
 
 @charset "utf-8";
+/*
 html,
 body,
 div,
@@ -180,6 +181,7 @@ textarea {
   vertical-align: top;
   font-family: sans-serif;
 }
+*/
 @font-face {
   font-family: "myfont";
   src: url("/fonts/myfont.eot?c=1419063630662");

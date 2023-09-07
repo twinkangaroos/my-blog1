@@ -68,16 +68,16 @@ const PostList = () => {
                         zIndex: 1, // 必要に応じてz-indexを調整します
                     }}
                 >
-                    <Button variation="warning" onClick={() => createButtonClick()} size="small">記事を作成する</Button>
+                    <Button variation="warning" onClick={() => createButtonClick()} size="large">記事を作成する</Button>
                 </Flex>
                 <Flex>
-                    <h2>お知らせ管理</h2>
+                    <h2>記事一覧</h2>
                 </Flex>
-                <Flex style={{ width: '800px' }}>
+                <Flex style={{ width: '100%' }}>
                     <Table
                     caption={""}
                     highlightOnHover={true}
-                    size={"small"}
+                    size={"large"}
                     //variation={"striped"}
                     >
                         <TableHead style={{ display: 'none' }}>
@@ -90,13 +90,13 @@ const PostList = () => {
                             posts.map(post => (
                                 <TableRow key={post.id}>
                                     <TableCell onClick={() => nextButtonClick(post.id)}>
-                                        <Flex direction="row">
-                                            <Flex direction="column"  gap="0rem" style={{ width: '700px' }}>
+                                        <Flex direction="row" justifyContent="space-between">
+                                            <Flex direction="column" gap="0rem">
                                                 <h3>{post.title}</h3>
                                                 <Flex style={{ color: 'gray' }}>更新日：{extractDateAndTimeChars(post.updatedAt)}</Flex>
                                             </Flex>
-                                            <Flex alignItems="center">
-                                                <Button variation="default" onClick={() => nextButtonClick(post.id)} size="small">編集</Button>
+                                            <Flex alignItems="center" style={{ marginRight: '10px' }}>
+                                                <Button variation="default" onClick={() => nextButtonClick(post.id)} size='large'>編集</Button>
                                             </Flex>
                                         </Flex>
                                     </TableCell>
