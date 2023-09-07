@@ -9,6 +9,7 @@ import ReactMarkdown from 'react-markdown'
 import { Comment, User, Like, LikeComment, CommentReply } from '../../models';
 import { useRef } from 'react';
 import { useAuthenticator } from '@aws-amplify/ui-react';
+import Link from 'next/link';
 
 
 const PostComponent = () => {
@@ -433,8 +434,8 @@ const PostComponent = () => {
                     <div className="l-contentsWidth">
                         <div className="l-mqWrapper">
                             <ol>
-                                <li><a href="/index.html"><span>with Glico</span></a></li>
-                                <li><a href="/cafe/index.html"><span>おしゃべりカフェ</span></a></li>
+                                <li><Link href="/"><span>with Glico</span></Link></li>
+                                <li><Link href="/"><span>おしゃべりカフェ</span></Link></li>
                             </ol>
                         </div>
                     </div>
