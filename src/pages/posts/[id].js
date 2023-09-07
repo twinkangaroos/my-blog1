@@ -10,6 +10,7 @@ import { Comment, User, Like, LikeComment, CommentReply } from '../../models';
 import { useRef } from 'react';
 import { useAuthenticator } from '@aws-amplify/ui-react';
 
+
 const PostComponent = () => {
     const [post, setPost] = useState("")
     const [post_list, setPostList] = useState([])
@@ -36,13 +37,38 @@ const PostComponent = () => {
     const router = useRouter()
     const { tokens } = useTheme()
 
+    useEffect(() => {
+        // publicのJSを読み込み
+        const script1 = document.createElement('script');
+        script1.type = 'text/javascript';
+        script1.src = '/js/script_4.js';
+        document.head.appendChild(script1);
+
+        const script2 = document.createElement('script');
+        script2.type = 'text/javascript';
+        script2.src = '/js/script_117.js';
+        document.head.appendChild(script2);
+
+        const script3 = document.createElement('script');
+        script3.type = 'text/javascript';
+        script3.src = '/js/script_127.js';
+        document.head.appendChild(script3);
+
+        return () => {
+            // コンポーネントがアンマウントされた際のクリーンアップ処理
+            document.head.removeChild(script1);
+            document.head.removeChild(script2);
+            document.head.removeChild(script3);
+        };
+    }, []);
+
     // パスパラメータの取得が完了したら、param_id ステートを更新
     useEffect(() => {
         if (router.query.id) {
             setParamId(router.query.id);
         }
     }, [router.query.id])
-    
+
     // param_id が有効な値の場合に doInit 関数を実行
     useEffect(() => {
         if (param_id !== null) {
@@ -69,7 +95,7 @@ const PostComponent = () => {
 
             // PostList取得
             const post_list_result = await DataStore.query(PostList, (c) => c.post_id.eq(param_id), {
-                sort:(s) => s.sort(SortDirection.ASCENDING),
+                sort: (s) => s.sort(SortDirection.ASCENDING),
             })
             if (post_list_result && post_list_result.length > 0) {
                 setPostList(post_list_result)
@@ -99,7 +125,7 @@ const PostComponent = () => {
     async function getComment() {
         // 現記事idに紐づくCommentを取得
         const comment_result = await DataStore.query(Comment, (c) => c.post_id.eq(param_id), {
-            sort:(s) => s.createdAt(SortDirection.DESCENDING),
+            sort: (s) => s.createdAt(SortDirection.DESCENDING),
         })
         if (comment_result && comment_result.length > 0) {
             // コメント登録直後は、createdAt = null のため、やむを得ず最新コメントをリストの先頭に移動
@@ -119,7 +145,7 @@ const PostComponent = () => {
                     if (nickname) {
                         commentUser[commentResult.id] = nickname
                     }
-            }))
+                }))
             setCommentUser(commentUser)
         }
         else {
@@ -137,7 +163,7 @@ const PostComponent = () => {
         }
         return null
     }
-    
+
     // コメントに対する「いいね」取得
     async function getLikeComment() {
         // 現記事idに紐づくLikeCommentの件数取得
@@ -176,7 +202,7 @@ const PostComponent = () => {
     async function getReplyComment() {
         // 現記事idに紐づくReplyCommentの件数取得
         const reply_comment_result = await DataStore.query(CommentReply, (c) => c.post_id.eq(param_id), {
-            sort:(s) => s.createdAt(SortDirection.DESCENDING),
+            sort: (s) => s.createdAt(SortDirection.DESCENDING),
         })
         if (reply_comment_result && reply_comment_result.length > 0) {
             // コメント登録直後は、createdAt = null のため、コメントをリストの先頭に移動
@@ -196,7 +222,7 @@ const PostComponent = () => {
                     if (nickname) {
                         commentReplyUser[commentReplyResult.id] = nickname
                     }
-            }))
+                }))
             setCommentReplyUser(commentReplyUser)
             console.log("Success in taking ReplyComment.")
         }
@@ -254,7 +280,7 @@ const PostComponent = () => {
 
             await DataStore.delete(CommentReply, (c) => c.comment_id.eq(comment_id))
             console.log("CommentReply successfully deleted.")
-            
+
             // コメント再取得
             getComment()
         }
@@ -341,11 +367,11 @@ const PostComponent = () => {
         setShowReplyArea(updatedShowReplyArea);
     }
 
-    
+
     // 返信ボタンクリック時(各コメントに）
     const onReplyClick = async (commentId, index) => {
         const replyText = replyRefArray.current[index].value
-        
+
         if (!replyText) {
             alert("返信内容を入力してください。");
             return;
@@ -363,7 +389,7 @@ const PostComponent = () => {
                     "post_id": param_id
                 })
             )
-            
+
             // テキストエリアの値をクリア
             if (replyRefArray.current[index]) {
                 replyRefArray.current[index].value = ""
@@ -403,308 +429,341 @@ const PostComponent = () => {
                 backgroundColor={tokens.colors.background.secondary}
                 padding={tokens.space.medium}
             >
+                <div className="c-breadcrumbsSet01">
+                    <div className="l-contentsWidth">
+                        <div className="l-mqWrapper">
+                            <ol>
+                                <li><a href="/index.html"><span>with Glico</span></a></li>
+                                <li><a href="/cafe/index.html"><span>おしゃべりカフェ</span></a></li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+                <div className="c-pageTitleSet01 type03">
+                    <div className="bgArea" style={{ backgroundImage: `url('/image/cafe_page_title01.png')` }}></div>
+                    <div className="bgAreaSp" style={{ backgroundImage: `url('/image/cafe_page_title01_sp.png')` }}></div>
+                    <div className="titleArea">
+                        <h1 className="m-pageTitle01"><span className="is-large">おしゃべりカフェ</span><span className="is-small">Talking
+                            Cafe</span><span className="townImage is-right"
+                                style={{ backgroundImage: `url('/image/cafe_town01.png')` }}></span>
+                        </h1>
+                    </div>
+                </div>
+
                 <Card>
-                    <Flex direction="column" alignItems="center" className="ProseMirror note-common-styles__textnote-body">
-                        <h1
-                            style={{ border: 'none', outline: 'none', lineHeight: '1.5', width: "640px" }}
-                            dangerouslySetInnerHTML={{ __html: post && post.title ? post.title : '' }}
-                        />
-                        {/***** POSTのループ *****/}
-                        {
-                            post_list.length > 0 ?
-                            post_list.map((postItem, index) => {
-                                const { type, content } = postItem
-                                if (type === "div") {
-                                    return (
-                                        <Flex key={index + "_head"}>
-                                            <div
-                                                key={index}
-                                                style={{ border: 'none', outline: 'none', lineHeight: '1.5', width: "640px"  }}
-                                                dangerouslySetInnerHTML={{ __html: content ? content.replace(/\n/g, '<br />') : '' }}
-                                            />
-                                        </Flex>
-                                    )
-                                } else if (type === "h2") {
-                                    return (
-                                        <Flex key={index + "_head"}>
-                                            <h2
-                                                key={index}
-                                                style={{ border: 'none', outline: 'none', lineHeight: '1.5', width: "640px"  }}
-                                                dangerouslySetInnerHTML={{ __html: content ? content.replace(/\n/g, '<br />') : '' }}
-                                            />
-                                        </Flex>
-                                    )
-                                } else if (type === "h3") {
-                                    return (
-                                        <Flex key={index + "_head"}>
-                                            <h3
-                                                key={index}
-                                                style={{ border: 'none', outline: 'none', lineHeight: '1.5', width: "640px"  }}
-                                                dangerouslySetInnerHTML={{ __html: content ? content.replace(/\n/g, '<br />') : '' }}
-                                            />
-                                        </Flex>
-                                    )
+                    <Flex direction="column" className='l-smallContentsWidth'>
+                        <Flex direction="column" alignItems="flex-start" className="ProseMirror note-common-styles__textnote-body">
+                            <h1
+                                style={{ border: 'none', outline: 'none', lineHeight: '1.5', width: "100%" }}
+                                dangerouslySetInnerHTML={{ __html: post && post.title ? post.title : '' }}
+                                className='m-bgTitle01'
+                            />
+                            {/***** POSTのループ *****/}
+                            {
+                                post_list.length > 0 ?
+                                    post_list.map((postItem, index) => {
+                                        const { type, content } = postItem
+                                        if (type === "div") {
+                                            return (
+                                                <Flex key={index + "_head"}>
+                                                    <div
+                                                        key={index}
+                                                        style={{ border: 'none', outline: 'none', lineHeight: '1.5' }}
+                                                        dangerouslySetInnerHTML={{ __html: content ? content.replace(/\n/g, '<br />') : '' }}
+                                                    />
+                                                </Flex>
+                                            )
+                                        } else if (type === "h2") {
+                                            return (
+                                                <Flex key={index + "_head"}>
+                                                    <h2
+                                                        key={index}
+                                                        style={{ border: 'none', outline: 'none', lineHeight: '1.5' }}
+                                                        dangerouslySetInnerHTML={{ __html: content ? content.replace(/\n/g, '<br />') : '' }}
+                                                    />
+                                                </Flex>
+                                            )
+                                        } else if (type === "h3") {
+                                            return (
+                                                <Flex key={index + "_head"}>
+                                                    <h3
+                                                        key={index}
+                                                        style={{ border: 'none', outline: 'none', lineHeight: '1.5' }}
+                                                        dangerouslySetInnerHTML={{ __html: content ? content.replace(/\n/g, '<br />') : '' }}
+                                                    />
+                                                </Flex>
+                                            )
+                                        }
+                                    })
+                                    :
+                                    ''
+                            }
+                        </Flex>
+
+                        <Flex direction="column" alignItems="center" >
+                            {/***** 記事に対する「いいね」エリア *****/}
+                            <Flex>
+                                {
+                                    user && like_id ?
+                                        <Button
+                                            variation="default"
+                                            size="Large"
+                                            isFullWidth={true}
+                                            style={{ width: '180px', marginTop: '20px', borderColor: 'red', fontSize: '16px' }}
+                                            onClick={() => onLikeClick()}
+                                        >
+                                            <>
+                                                <Icon
+                                                    ariaLabel="Favorite"
+                                                    viewBox={{ width: 24, height: 24 }}
+                                                    pathData="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0
+                                        3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"
+                                                    fill="red"
+                                                />
+                                                &nbsp;いいねを解除
+                                            </>
+                                        </Button>
+                                        :
+                                        ''
                                 }
-                            })
-                            :
-                            ''
-                        }
-                        {/***** 記事に対する「いいね」エリア *****/}
-                        <Flex justifyContent="center">
-                        {
-                            user && like_id ?
-                            <Button 
-                                variation="default" 
-                                size="Large" 
-                                isFullWidth={true}
-                                style={{ width: '180px', marginTop: '20px', borderColor: 'red' }}
-                                onClick={() => onLikeClick()}
-                            >
-                            <>
-                                <Icon
-                                    ariaLabel="Favorite"
-                                    viewBox={{ width: 24, height: 24 }}
-                                    pathData="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0
-                                    3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"
-                                    fill="red"
-                                />
-                                &nbsp;いいねを解除
-                            </>
-                            </Button>
-                            :
-                            ''
-                        }
-                        {
-                            user && !like_id ?
-                            <Button 
-                                variation="default" 
-                                size="Large" 
-                                isFullWidth={true}
-                                style={{ width: '180px', marginTop: '20px', borderColor: 'red' }}
-                                onClick={() => onLikeClick()}
-                            >
-                            <>
-                                <Icon
-                                    ariaLabel="Favorite"
-                                    viewBox={{ width: 24, height: 24 }}
-                                    pathData="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0
-                                    3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"
-                                    fill="lightgray"
-                                />
-                                &nbsp;いいね
-                            </>
-                            </Button>
-                            :
-                            ''
-                        }
-                        {
-                            !user ?
-                                <Button 
-                                variation="default" 
-                                size="Large" 
-                                isFullWidth={true}
-                                style={{ width: '400px', marginTop: '20px', borderColor: 'red' }}
-                                onClick={() => onLikeClick()}
-                                isDisabled={true}
-                            >「いいね」するにはログインしてください</Button>
-                            :
-                            ''
-                        }
+                                {
+                                    user && !like_id ?
+                                        <Button
+                                            variation="default"
+                                            size="Large"
+                                            isFullWidth={true}
+                                            style={{ width: '180px', marginTop: '20px', borderColor: 'red', fontSize: '16px' }}
+                                            onClick={() => onLikeClick()}
+                                        >
+                                            <>
+                                                <Icon
+                                                    ariaLabel="Favorite"
+                                                    viewBox={{ width: 24, height: 24 }}
+                                                    pathData="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0
+                                        3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"
+                                                    fill="lightgray"
+                                                />
+                                                &nbsp;いいね
+                                            </>
+                                        </Button>
+                                        :
+                                        ''
+                                }
+                                {
+                                    !user ?
+                                        <Button
+                                            variation="default"
+                                            size="Large"
+                                            isFullWidth={true}
+                                            style={{ width: '400px', marginTop: '20px', borderColor: 'red', fontSize: '16px' }}
+                                            onClick={() => onLikeClick()}
+                                            isDisabled={true}
+                                        >「いいね」するにはログインしてください</Button>
+                                        :
+                                        ''
+                                }
+                            </Flex>
                         </Flex>
                         
-                        {/***** 記事に対する（自分の）コメントエリア *****/}
-                        <h3>この記事にコメントする</h3>
-                        <TextAreaField 
-                            ref={(commentRef)}
-                            rows="5"
-                            style={{ outline: 'none', lineHeight: '1.5', width: "640px" }}
-                            placeholder='コメント記入後、「コメントする」ボタンを押すとすぐに公開されます。'
-                            onChange={(e) => setMyComment(e.target.value)}
-                        />
-                        <Flex justifyContent="center" style={{ marginBottom: '40px' }}>
-                            {
-                                user?
-                                <Button 
-                                    variation="primary"
-                                    size="Large" 
-                                    isFullWidth={true}
-                                    style={{  width: '200px', marginTop: '20px', backgroundColor: 'red' }}
-                                    onClick={() => onCommentClick()}
-                                >コメントする</Button>
-                                :
-                                <Button 
-                                    variation="primary"
-                                    size="Large" 
-                                    isFullWidth={true}
-                                    style={{  width: '400px', marginTop: '20px' }}
-                                    onClick={() => onCommentClick()}
-                                    isDisabled={true}
-                                >コメントするにはログインしてください</Button>
-                            }
-                            
+                        <Flex direction="column" alignItems="flex-start" style={{ marginTop: '20px' }}>
+                            {/***** 記事に対する（自分の）コメントエリア *****/}
+                            <h3 className='m-borderBottomTitle01' style={{ width: '100%' }}>この記事にコメントする</h3>
+                            <TextAreaField
+                                ref={(commentRef)}
+                                rows="5"
+                                style={{ outline: 'none', lineHeight: '1.5', fontSize: '14px' }}
+                                placeholder='コメント記入後、「コメントする」ボタンを押すとすぐに公開されます。'
+                                onChange={(e) => setMyComment(e.target.value)}
+                                width={'100%'}
+                            />
                         </Flex>
-                        {/***** 記事に対する（みなさんの）コメントエリア *****/}
-                        {
-                            comment.length > 0 ?
-                            <h2>この記事に関するみなさんからのコメント</h2>
-                            :
-                            ''
-                        }
-                        <Flex direction="column">
-                        {
-                            // *****（みなさんの）コメントブロック *****
-                            comment.map((commentItem, index) => (
-                                <Card 
-                                    key={commentItem.id} 
-                                    variation="outlined" 
-                                    style={{ borderColor: 'lightgray', width: '640px' }}
-                                >
-                                    <Flex
-                                        direction="column"
-                                        gap={tokens.space.xs}
-                                    >
-                                        {/***** 記事に対するコメント *****/}
-                                        <Flex alignItems="flex-start">
-                                            {/***** ニックネーム *****/}
-                                            <Badge size="small" variation="info">
-                                                {comment_user[commentItem.id]}
-                                            </Badge>
-                                            {/***** 更新日時 *****/}
-                                            {
-                                                commentItem.updatedAt ?
-                                                <Badge size="small" variation="success">
-                                                    {extractDateAndTimeChars(commentItem.updatedAt)}
-                                                </Badge>
-                                                :
-                                                ''
-                                            }
-                                        </Flex>
-                                        {/***** コメント本文 *****/}
-                                        <Text as="span">
-                                            {commentItem.comment_body}
-                                        </Text>
-                                        {/***** 削除・返信エリア *****/}
-                                        <Flex 
-                                            direction="row" 
-                                            justifyContent="flex-end"
-                                            alignItems="center"
+
+                        <Flex direction="column" alignItems="center" >
+                            <Flex style={{ marginBottom: '40px' }}>
+                                {
+                                    user ?
+                                        <Button
+                                            variation="primary"
+                                            size="Large"
+                                            isFullWidth={true}
+                                            style={{ width: '200px', marginTop: '20px', backgroundColor: 'red', fontSize: '14px' }}
+                                            onClick={() => onCommentClick()}
+                                        >コメントする</Button>
+                                        :
+                                        <Button
+                                            variation="primary"
+                                            size="Large"
+                                            isFullWidth={true}
+                                            style={{ width: '400px', marginTop: '20px' }}
+                                            onClick={() => onCommentClick()}
+                                            isDisabled={true}
+                                        >コメントするにはログインしてください</Button>
+                                }
+
+                            </Flex>
+                            {/***** 記事に対する（みなさんの）コメントエリア *****/}
+                            {
+                                comment.length > 0 ?
+                                    <h2>この記事に関するみなさんからのコメント</h2>
+                                    :
+                                    ''
+                            }
+                            <Flex direction="column">
+                                {
+                                    // *****（みなさんの）コメントブロック *****
+                                    comment.map((commentItem, index) => (
+                                        <Card
+                                            key={commentItem.id}
+                                            variation="outlined"
+                                            style={{ borderColor: 'lightgray', width: '100%' }}
                                         >
-                                            {/***** 削除ボタン *****/}
-                                            {
-                                                user && user.username === commentItem.user_id ?
-                                                <Button variation="link" size="small" onClick={() => onCommentDelete(commentItem.id)}>削除</Button>
-                                                :
-                                                ''
-                                            }
-                                            {/***** 返信ボタン *****/}
-                                            {
-                                                user ?
-                                                <Button variation="default" size="small" onClick={() => toggleReplyArea(index)}>返信</Button>
-                                                :
-                                                <Button variation="default" size="small" disabled={true}>返信するにはログインしてください</Button>
-                                            }
-                                            
-                                            {/***** （みなさんの）コメントに対するいいねボタン *****/}
-                                            {
-                                                like_my_comment.find((lmc) => lmc.comment_id === commentItem.id) ?
-                                                <Button 
-                                                    variation="default" 
-                                                    size="small" 
-                                                    style={{ width: '10px', border: 'none' }}
-                                                    onClick={() => onLikeCommentClick(commentItem.id, true)}
-                                                >
-                                                    <Icon
-                                                        ariaLabel="Favorite"
-                                                        viewBox={{ width: 24, height: 24 }}
-                                                        pathData="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0
-                                                        3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"
-                                                        fill="red"
-                                                    />
-                                                </Button>
-                                                :
-                                                <Button 
-                                                    variation="default" 
-                                                    size="small" 
-                                                    style={{ width: '10px', border: 'none' }}
-                                                    onClick={() => onLikeCommentClick(commentItem.id, false)}
-                                                >
-                                                    <Icon
-                                                        ariaLabel="Favorite"
-                                                        viewBox={{ width: 24, height: 24 }}
-                                                        pathData="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0
-                                                        3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"
-                                                        fill="lightgray"
-                                                    />
-                                                </Button>
-                                            }
-                                            {/***** コメントに対するいいねの件数 *****/}
-                                            {
-                                                like_comment_counts[commentItem.id] ?
-                                                like_comment_counts[commentItem.id]
-                                                :
-                                                0
-                                            }
-                                        </Flex>
-                                    </Flex>
-                                    {/***** 返信コメント入力エリア *****/}
-                                    {
-                                        showReplyArea[index] && ( // 返信入力エリアが表示されている場合に表示
-                                            <Flex direction="column">
-                                                <TextAreaField 
-                                                    ref={ref => (replyRefArray.current[index] = ref)}
-                                                    rows="5"
-                                                    style={{ outline: 'none', lineHeight: '1.5', width: "100%" }}
-                                                    placeholder='入力後、「返信する」ボタンを押すとすぐに公開されます。'
-                                                />
-                                                <Button 
-                                                    variation="primary"
-                                                    size="Large" 
-                                                    isFullWidth={true}
-                                                    style={{  width: '100%', backgroundColor: 'red' }}
-                                                    onClick={() => onReplyClick(commentItem.id, index)}
-                                                >返信する</Button>
-                                            </Flex>
-                                        )
-                                    }
-                                    {/***** 返信コメント表示エリア *****/}
-                                    {
-                                        reply_comment.map((replyItem, index2) => (
-                                            replyItem.comment_id === commentItem.id ?
                                             <Flex
-                                                key={index2}
                                                 direction="column"
                                                 gap={tokens.space.xs}
-                                                style={{ backgroundColor: 'whitesmoke', margin: '6px', padding: '16px', borderRadius: '10px' }}
                                             >
                                                 {/***** 記事に対するコメント *****/}
                                                 <Flex alignItems="flex-start">
                                                     {/***** ニックネーム *****/}
                                                     <Badge size="small" variation="info">
-                                                    {comment_reply_user[replyItem.id]}
+                                                        {comment_user[commentItem.id]}
                                                     </Badge>
                                                     {/***** 更新日時 *****/}
                                                     {
-                                                        replyItem.updatedAt ?
-                                                        <Badge size="small" variation="success">
-                                                            {extractDateAndTimeChars(replyItem.updatedAt)}
-                                                        </Badge>
-                                                        :
-                                                        ''
+                                                        commentItem.updatedAt ?
+                                                            <Badge size="small" variation="success">
+                                                                {extractDateAndTimeChars(commentItem.updatedAt)}
+                                                            </Badge>
+                                                            :
+                                                            ''
                                                     }
                                                 </Flex>
                                                 {/***** コメント本文 *****/}
-                                                <Text as="span">
-                                                    {replyItem.comment_body}
+                                                <Text as="span" style={{ fontSize: '13px' }}>
+                                                    {commentItem.comment_body}
                                                 </Text>
+                                                {/***** 削除・返信エリア *****/}
+                                                <Flex
+                                                    direction="row"
+                                                    justifyContent="flex-end"
+                                                    alignItems="center"
+                                                >
+                                                    {/***** 削除ボタン *****/}
+                                                    {
+                                                        user && user.username === commentItem.user_id ?
+                                                            <Button variation="link" size="small" onClick={() => onCommentDelete(commentItem.id)}>削除</Button>
+                                                            :
+                                                            ''
+                                                    }
+                                                    {/***** 返信ボタン *****/}
+                                                    {
+                                                        user ?
+                                                            <Button variation="default" size="small" onClick={() => toggleReplyArea(index)}>返信</Button>
+                                                            :
+                                                            <Button variation="default" size="small" disabled={true}>返信するにはログインしてください</Button>
+                                                    }
+
+                                                    {/***** （みなさんの）コメントに対するいいねボタン *****/}
+                                                    {
+                                                        like_my_comment.find((lmc) => lmc.comment_id === commentItem.id) ?
+                                                            <Button
+                                                                variation="default"
+                                                                size="small"
+                                                                style={{ width: '10px', border: 'none' }}
+                                                                onClick={() => onLikeCommentClick(commentItem.id, true)}
+                                                            >
+                                                                <Icon
+                                                                    ariaLabel="Favorite"
+                                                                    viewBox={{ width: 24, height: 24 }}
+                                                                    pathData="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0
+                                                            3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"
+                                                                    fill="red"
+                                                                />
+                                                            </Button>
+                                                            :
+                                                            <Button
+                                                                variation="default"
+                                                                size="small"
+                                                                style={{ width: '10px', border: 'none' }}
+                                                                onClick={() => onLikeCommentClick(commentItem.id, false)}
+                                                            >
+                                                                <Icon
+                                                                    ariaLabel="Favorite"
+                                                                    viewBox={{ width: 24, height: 24 }}
+                                                                    pathData="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0
+                                                            3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"
+                                                                    fill="lightgray"
+                                                                />
+                                                            </Button>
+                                                    }
+                                                    {/***** コメントに対するいいねの件数 *****/}
+                                                    {
+                                                        like_comment_counts[commentItem.id] ?
+                                                            like_comment_counts[commentItem.id]
+                                                            :
+                                                            0
+                                                    }
+                                                </Flex>
                                             </Flex>
-                                            :
-                                            ''
-                                            
-                                        ))
-                                    }
-                                </Card>
-                            ))
-                        }
+                                            {/***** 返信コメント入力エリア *****/}
+                                            {
+                                                showReplyArea[index] && ( // 返信入力エリアが表示されている場合に表示
+                                                    <Flex direction="column">
+                                                        <TextAreaField
+                                                            ref={ref => (replyRefArray.current[index] = ref)}
+                                                            rows="5"
+                                                            style={{ outline: 'none', lineHeight: '1.5', width: "100%" }}
+                                                            placeholder='入力後、「返信する」ボタンを押すとすぐに公開されます。'
+                                                        />
+                                                        <Button
+                                                            variation="primary"
+                                                            size="Large"
+                                                            isFullWidth={true}
+                                                            style={{ width: '100%', backgroundColor: 'red' }}
+                                                            onClick={() => onReplyClick(commentItem.id, index)}
+                                                        >返信する</Button>
+                                                    </Flex>
+                                                )
+                                            }
+                                            {/***** 返信コメント表示エリア *****/}
+                                            {
+                                                reply_comment.map((replyItem, index2) => (
+                                                    replyItem.comment_id === commentItem.id ?
+                                                        <Flex
+                                                            key={index2}
+                                                            direction="column"
+                                                            gap={tokens.space.xs}
+                                                            style={{ backgroundColor: 'whitesmoke', margin: '6px', padding: '16px', borderRadius: '10px' }}
+                                                        >
+                                                            {/***** 記事に対するコメント *****/}
+                                                            <Flex alignItems="flex-start">
+                                                                {/***** ニックネーム *****/}
+                                                                <Badge size="small" variation="info">
+                                                                    {comment_reply_user[replyItem.id]}
+                                                                </Badge>
+                                                                {/***** 更新日時 *****/}
+                                                                {
+                                                                    replyItem.updatedAt ?
+                                                                        <Badge size="small" variation="success">
+                                                                            {extractDateAndTimeChars(replyItem.updatedAt)}
+                                                                        </Badge>
+                                                                        :
+                                                                        ''
+                                                                }
+                                                            </Flex>
+                                                            {/***** コメント本文 *****/}
+                                                            <Text as="span" style={{ fontSize: '13px' }}>
+                                                                {replyItem.comment_body}
+                                                            </Text>
+                                                        </Flex>
+                                                        :
+                                                        ''
+
+                                                ))
+                                            }
+                                        </Card>
+                                    ))
+                                }
+                            </Flex>
                         </Flex>
                     </Flex>
                 </Card>
