@@ -321,8 +321,8 @@ const PostDetail = () => {
                     <div className="l-contentsWidth">
                         <div className="l-mqWrapper">
                             <ol>
-                                <li><a href="/index.html"><span>with Glico</span></a></li>
-                                <li><a href="/cafe/index.html"><span>おしゃべりカフェ</span></a></li>
+                                <li><Link href="/"><span>with Glico</span></Link></li>
+                                <li><Link href="/"><span>おしゃべりカフェ</span></Link></li>
                             </ol>
                         </div>
                     </div>
