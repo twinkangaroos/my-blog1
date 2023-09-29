@@ -16,6 +16,10 @@ type EagerRecipeclub = {
   readonly subtitle?: string | null;
   readonly main_image?: string | null;
   readonly ingredient?: string | null;
+  readonly brandsite_url?: string | null;
+  readonly directshop_url?: string | null;
+  readonly amazon_url?: string | null;
+  readonly lohaco_url?: string | null;
   readonly createdAt?: string | null;
   readonly updatedAt?: string | null;
 }
@@ -30,6 +34,10 @@ type LazyRecipeclub = {
   readonly subtitle?: string | null;
   readonly main_image?: string | null;
   readonly ingredient?: string | null;
+  readonly brandsite_url?: string | null;
+  readonly directshop_url?: string | null;
+  readonly amazon_url?: string | null;
+  readonly lohaco_url?: string | null;
   readonly createdAt?: string | null;
   readonly updatedAt?: string | null;
 }

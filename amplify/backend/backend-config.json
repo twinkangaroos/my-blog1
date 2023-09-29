@@ -47,5 +47,12 @@
       "providerPlugin": "awscloudformation",
       "service": "Cognito"
     }
+  },
+  "storage": {
+    "s3nextblog2storage9f85914b": {
+      "dependsOn": [],
+      "providerPlugin": "awscloudformation",
+      "service": "S3"
+    }
   }
 }

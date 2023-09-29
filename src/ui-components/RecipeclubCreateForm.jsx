@@ -27,17 +27,33 @@ export default function RecipeclubCreateForm(props) {
     subtitle: "",
     main_image: "",
     ingredient: "",
+    brandsite_url: "",
+    directshop_url: "",
+    amazon_url: "",
+    lohaco_url: "",
   };
   const [title, setTitle] = React.useState(initialValues.title);
   const [subtitle, setSubtitle] = React.useState(initialValues.subtitle);
   const [main_image, setMain_image] = React.useState(initialValues.main_image);
   const [ingredient, setIngredient] = React.useState(initialValues.ingredient);
+  const [brandsite_url, setBrandsite_url] = React.useState(
+    initialValues.brandsite_url
+  );
+  const [directshop_url, setDirectshop_url] = React.useState(
+    initialValues.directshop_url
+  );
+  const [amazon_url, setAmazon_url] = React.useState(initialValues.amazon_url);
+  const [lohaco_url, setLohaco_url] = React.useState(initialValues.lohaco_url);
   const [errors, setErrors] = React.useState({});
   const resetStateValues = () => {
     setTitle(initialValues.title);
     setSubtitle(initialValues.subtitle);
     setMain_image(initialValues.main_image);
     setIngredient(initialValues.ingredient);
+    setBrandsite_url(initialValues.brandsite_url);
+    setDirectshop_url(initialValues.directshop_url);
+    setAmazon_url(initialValues.amazon_url);
+    setLohaco_url(initialValues.lohaco_url);
     setErrors({});
   };
   const validations = {
@@ -45,6 +61,10 @@ export default function RecipeclubCreateForm(props) {
     subtitle: [],
     main_image: [],
     ingredient: [],
+    brandsite_url: [],
+    directshop_url: [],
+    amazon_url: [],
+    lohaco_url: [],
   };
   const runValidationTasks = async (
     fieldName,
@@ -75,6 +95,10 @@ export default function RecipeclubCreateForm(props) {
           subtitle,
           main_image,
           ingredient,
+          brandsite_url,
+          directshop_url,
+          amazon_url,
+          lohaco_url,
         };
         const validationResponses = await Promise.all(
           Object.keys(validations).reduce((promises, fieldName) => {
@@ -133,6 +157,10 @@ export default function RecipeclubCreateForm(props) {
               subtitle,
               main_image,
               ingredient,
+              brandsite_url,
+              directshop_url,
+              amazon_url,
+              lohaco_url,
             };
             const result = onChange(modelFields);
             value = result?.title ?? value;
@@ -160,6 +188,10 @@ export default function RecipeclubCreateForm(props) {
               subtitle: value,
               main_image,
               ingredient,
+              brandsite_url,
+              directshop_url,
+              amazon_url,
+              lohaco_url,
             };
             const result = onChange(modelFields);
             value = result?.subtitle ?? value;
@@ -187,6 +219,10 @@ export default function RecipeclubCreateForm(props) {
               subtitle,
               main_image: value,
               ingredient,
+              brandsite_url,
+              directshop_url,
+              amazon_url,
+              lohaco_url,
             };
             const result = onChange(modelFields);
             value = result?.main_image ?? value;
@@ -214,6 +250,10 @@ export default function RecipeclubCreateForm(props) {
               subtitle,
               main_image,
               ingredient: value,
+              brandsite_url,
+              directshop_url,
+              amazon_url,
+              lohaco_url,
             };
             const result = onChange(modelFields);
             value = result?.ingredient ?? value;
@@ -227,6 +267,130 @@ export default function RecipeclubCreateForm(props) {
         errorMessage={errors.ingredient?.errorMessage}
         hasError={errors.ingredient?.hasError}
         {...getOverrideProps(overrides, "ingredient")}
+      ></TextField>
+      <TextField
+        label="Brandsite url"
+        isRequired={false}
+        isReadOnly={false}
+        value={brandsite_url}
+        onChange={(e) => {
+          let { value } = e.target;
+          if (onChange) {
+            const modelFields = {
+              title,
+              subtitle,
+              main_image,
+              ingredient,
+              brandsite_url: value,
+              directshop_url,
+              amazon_url,
+              lohaco_url,
+            };
+            const result = onChange(modelFields);
+            value = result?.brandsite_url ?? value;
+          }
+          if (errors.brandsite_url?.hasError) {
+            runValidationTasks("brandsite_url", value);
+          }
+          setBrandsite_url(value);
+        }}
+        onBlur={() => runValidationTasks("brandsite_url", brandsite_url)}
+        errorMessage={errors.brandsite_url?.errorMessage}
+        hasError={errors.brandsite_url?.hasError}
+        {...getOverrideProps(overrides, "brandsite_url")}
+      ></TextField>
+      <TextField
+        label="Directshop url"
+        isRequired={false}
+        isReadOnly={false}
+        value={directshop_url}
+        onChange={(e) => {
+          let { value } = e.target;
+          if (onChange) {
+            const modelFields = {
+              title,
+              subtitle,
+              main_image,
+              ingredient,
+              brandsite_url,
+              directshop_url: value,
+              amazon_url,
+              lohaco_url,
+            };
+            const result = onChange(modelFields);
+            value = result?.directshop_url ?? value;
+          }
+          if (errors.directshop_url?.hasError) {
+            runValidationTasks("directshop_url", value);
+          }
+          setDirectshop_url(value);
+        }}
+        onBlur={() => runValidationTasks("directshop_url", directshop_url)}
+        errorMessage={errors.directshop_url?.errorMessage}
+        hasError={errors.directshop_url?.hasError}
+        {...getOverrideProps(overrides, "directshop_url")}
+      ></TextField>
+      <TextField
+        label="Amazon url"
+        isRequired={false}
+        isReadOnly={false}
+        value={amazon_url}
+        onChange={(e) => {
+          let { value } = e.target;
+          if (onChange) {
+            const modelFields = {
+              title,
+              subtitle,
+              main_image,
+              ingredient,
+              brandsite_url,
+              directshop_url,
+              amazon_url: value,
+              lohaco_url,
+            };
+            const result = onChange(modelFields);
+            value = result?.amazon_url ?? value;
+          }
+          if (errors.amazon_url?.hasError) {
+            runValidationTasks("amazon_url", value);
+          }
+          setAmazon_url(value);
+        }}
+        onBlur={() => runValidationTasks("amazon_url", amazon_url)}
+        errorMessage={errors.amazon_url?.errorMessage}
+        hasError={errors.amazon_url?.hasError}
+        {...getOverrideProps(overrides, "amazon_url")}
+      ></TextField>
+      <TextField
+        label="Lohaco url"
+        isRequired={false}
+        isReadOnly={false}
+        value={lohaco_url}
+        onChange={(e) => {
+          let { value } = e.target;
+          if (onChange) {
+            const modelFields = {
+              title,
+              subtitle,
+              main_image,
+              ingredient,
+              brandsite_url,
+              directshop_url,
+              amazon_url,
+              lohaco_url: value,
+            };
+            const result = onChange(modelFields);
+            value = result?.lohaco_url ?? value;
+          }
+          if (errors.lohaco_url?.hasError) {
+            runValidationTasks("lohaco_url", value);
+          }
+          setLohaco_url(value);
+        }}
+        onBlur={() => runValidationTasks("lohaco_url", lohaco_url)}
+        errorMessage={errors.lohaco_url?.errorMessage}
+        hasError={errors.lohaco_url?.hasError}
+        {...getOverrideProps(overrides, "lohaco_url")}
       ></TextField>
       <Flex
         justifyContent="space-between"

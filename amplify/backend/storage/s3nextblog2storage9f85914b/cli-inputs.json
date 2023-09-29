@@ -1,0 +1,16 @@
+{
+  "resourceName": "s3nextblog2storage9f85914b",
+  "bucketName": "nextblog2-storage-9f85914b",
+  "policyUUID": "80819b60",
+  "storageAccess": "authAndGuest",
+  "guestAccess": [
+    "DELETE",
+    "READ",
+    "CREATE_AND_UPDATE"
+  ],
+  "authAccess": [
+    "CREATE_AND_UPDATE",
+    "READ",
+    "DELETE"
+  ]
+}

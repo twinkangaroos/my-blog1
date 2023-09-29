@@ -17,6 +17,9 @@
       },
       "api": {
         "NextBlog2": {}
+      },
+      "storage": {
+        "s3nextblog2storage9f85914b": {}
       }
     }
   }

@@ -38,6 +38,34 @@ export const schema = {
                     "isRequired": false,
                     "attributes": []
                 },
+                "brandsite_url": {
+                    "name": "brandsite_url",
+                    "isArray": false,
+                    "type": "String",
+                    "isRequired": false,
+                    "attributes": []
+                },
+                "directshop_url": {
+                    "name": "directshop_url",
+                    "isArray": false,
+                    "type": "String",
+                    "isRequired": false,
+                    "attributes": []
+                },
+                "amazon_url": {
+                    "name": "amazon_url",
+                    "isArray": false,
+                    "type": "String",
+                    "isRequired": false,
+                    "attributes": []
+                },
+                "lohaco_url": {
+                    "name": "lohaco_url",
+                    "isArray": false,
+                    "type": "String",
+                    "isRequired": false,
+                    "attributes": []
+                },
                 "createdAt": {
                     "name": "createdAt",
                     "isArray": false,
@@ -623,5 +651,5 @@ export const schema = {
     "enums": {},
     "nonModels": {},
     "codegenVersion": "3.3.5",
-    "version": "06433cb5f8c63b75c1d27eb52c74c124"
+    "version": "1587fc8a6360f6c476151d8689e13b5e"
 };

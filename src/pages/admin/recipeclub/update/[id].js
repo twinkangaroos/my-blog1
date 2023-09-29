@@ -2,23 +2,34 @@ import '@aws-amplify/ui-react/styles.css';
 //import styles from "../../../../styles/editable.module.css"
 import { useRouter } from 'next/router'
 import { DataStore, SortDirection } from '@aws-amplify/datastore';
-//import { Post, PostList } from '../../../../models';
 import { Recipeclub } from '../../../../models';
 import { useState, useEffect } from 'react';
-import { Card, View, Flex, Button, useTheme, Link, Loader, RadioGroupField, Radio } from '@aws-amplify/ui-react';
+import { Card, View, Flex, Button, useTheme, Link, Loader, RadioGroupField, Radio, Image } from '@aws-amplify/ui-react';
 import { useRef } from 'react';
 import { Authenticator } from '@aws-amplify/ui-react';
-import HeaderAdmin from "../../../HeaderAdmin"
+import HeaderAdmin from "../../../HeaderAdmin";
+import ImageUploader from '../../../../utils/ImageUploader';
+import { Storage } from 'aws-amplify';
 
 const RecipeclubDetail = () => {
     const [recipeclub, setRecipeclub] = useState("")
     //const [post_list, setPostList] = useState([])
     const [id, setId] = useState("")
+    const [main_image_path, setMainImagePath] = useState(null);
+    const [brandsite_url, setBrandsiteUrl] = useState("")
+    const [directshop_url, setDirectshopUrl] = useState("")
+    const [amazon_url, setAmazonUrl] = useState("")
+    const [lohaco_url, setLohacoUrl] = useState("")
     //const [focusOnNextAdd, setFocusOnNextAdd] = useState(true); // 要素追加時にフォーカスを当てるかのフラグ
     const divRefs = useRef([]); // contenteditableの参照を保持する配列
     const titleRef = useRef(null); // title要素のrefを作成
     const subtitleRef = useRef(null); // subtitle要素のrefを作成
     const ingredientRef = useRef(null);
+    const brandsiteUrlRef = useRef(null);
+    const directshopUrlRef = useRef(null);
+    const amazonUrlRef = useRef(null);
+    const lohacoUrlRef = useRef(null);
+
     const [contents, setContents] = useState(['']); // 各要素のvalueを保持する配列（移動時に必要。Modelは書き込み不可のため）
 
     // パスパラメータからidを取得
@@ -77,6 +88,21 @@ const RecipeclubDetail = () => {
                 setRecipeclub(recipe_result[0])
                 console.log("First success in taking Recipeclub.", recipe_result[0])
 
+                // 画像の取得
+                try {
+                    const image_file = await Storage.get(recipe_result[0].main_image)
+                    setMainImagePath(image_file)
+                }
+                catch (error) {
+                    console.error('Error fetchImage:', error);
+                }
+
+                if (recipe_result[0].brandsite_url) {
+                    brandsiteUrlRef.current.innerHTML = recipe_result[0].brandsite_url
+                } else {
+                    // ブランドサイトへリンクを初期セット
+                    brandsiteUrlRef.current.innerHTML = '<a href="https://www.glico.com/jp/product/">〉ブランドサイトへ</a>';
+                }
                 // PostList取得
                 //const post_list_result = await DataStore.query(PostList, (c) => c.post_id.eq(param_id), {
                 //    sort:(s) => s.sort(SortDirection.ASCENDING),
@@ -97,6 +123,35 @@ const RecipeclubDetail = () => {
         }
     }
 
+    
+    // 「〉ブランドサイトへ」リンク挿入
+    const insertBrandsiteLink = () => {
+        // https://www.glico.com/jp/product/snack_biscuit_cookie/cratz/?=recipeclub
+        //const selectedText = window.getSelection().toString();
+        //${selectedText}
+        // 正規表現でhref属性の値を取得
+        const str = brandsiteUrlRef.current.innerHTML;
+        const hrefRegex = /href="([^"]+)"/;
+        const match = str.match(hrefRegex);
+        let hrefValue = '';
+        if (match) {
+            hrefValue = match[1];
+            console.log('href属性の値:', hrefValue);
+        }
+        const url = prompt('リンク先URLを https:// から入力してください:', hrefValue);
+        if (url) {
+            // リンクを挿入
+            const linkHTML = `<a href="${url}" target="_blank">〉ブランドサイトへ</a>`;
+            brandsiteUrlRef.current.innerHTML = linkHTML;
+            //document.execCommand('insertHTML', false, linkHTML);
+        }
+    }
+    const insertDirectshopLink = () => {
+    }
+    const insertAmazonLink = () => {
+    }
+    const insertLohacoLink = () => {
+    }
     // 更新ボタンクリック
     const onUClick = async (e) => {
         e.preventDefault()
@@ -110,13 +165,18 @@ const RecipeclubDetail = () => {
                     alert("サブタイトルを入力してください")
                     return
                 }
-                if (!ingredientRef.current.innerText) {
+                if (!ingredientRef.current.innerHTML) {
                     alert("材料を入力してください")
+                    return
+                }
+                if (!brandsiteUrlRef.current.innerHTML) {
+                    alert("ブランドサイトURLを入力してください")
                     return
                 }
                 const updatedTitle = titleRef.current.innerText
                 const updatedSubTitle = subtitleRef.current.innerText
                 const updatedIngredient = ingredientRef.current.innerHTML
+                const updatedBrandsiteUrl = brandsiteUrlRef.current.innerHTML
                 const currentDate = new Date() // 2023-08-09T09:02:09.955Z
                 // AWSDate 形式に変換
                 const awsDate = currentDate.toISOString().split('T')[0]
@@ -134,6 +194,7 @@ const RecipeclubDetail = () => {
                                 updated.title = updatedTitle
                                 updated.subtitle = updatedSubTitle
                                 updated.ingredient = updatedIngredient
+                                updated.brandsite_url = updatedBrandsiteUrl
                                 updated.show_date = awsDate
                             }
                         )
@@ -203,6 +264,8 @@ const RecipeclubDetail = () => {
             console.error('更新時にエラーが発生しました:', error);
         }
     }
+
+
 
     // 削除ボタンクリック
     const onDClick = async (e) => {
@@ -352,7 +415,7 @@ const RecipeclubDetail = () => {
                                         recipeclub ?
                                         <h2
                                             contentEditable
-                                            style={{ border: 'none', outline: 'none', lineHeight: '1.5', width: "100%" }}
+                                            style={{ border: '',  outline: 'none', lineHeight: '1.5', width: "100%" }}
                                             dangerouslySetInnerHTML={{ __html: recipeclub && recipeclub.title ? recipeclub.title : '' }}
                                             ref={titleRef} // refをtitle要素に紐付け
                                             onKeyDown={handleKeyDownEnter} // Enterキーの処理を行う
@@ -365,7 +428,7 @@ const RecipeclubDetail = () => {
                                     
                                     <div
                                         contentEditable 
-                                        style={{ border: 'none', outline: 'none', lineHeight: '1.5', width: "100%" }}
+                                        style={{ border: '', outline: 'none', lineHeight: '1.5', width: "100%" }}
                                         dangerouslySetInnerHTML={{ __html: recipeclub && recipeclub.subtitle ? recipeclub.subtitle : '' }}
                                         ref={subtitleRef}
                                         onKeyDown={handleKeyDownEnter}
@@ -377,21 +440,27 @@ const RecipeclubDetail = () => {
                                         <div className="c-imageSet01">
                                             <div className="imageBlock">
                                                 <div className="m-imageModule01">
-                                                    <p className="image"><img src="https://with.glico.com/image.jsp?id=52148" alt="イメージ" align="middle" />
+                                                    <p className="image">
+                                                        {
+                                                            main_image_path && (
+                                                                <Image src={main_image_path} />
+                                                            )
+                                                        }
                                                     </p>
                                                 </div>
+                                                <ImageUploader />
                                             </div>
                                         </div>
+                                        
+                                        
 
                                         <div className="recipe_zairyo">
                                             <div><span className="recipe_zairyo_title">材料</span>　1人分</div>
-                                            {/*<li>クラッツ（お好みの味で）：適量</li><li>じゃがいも：3個</li><li>きゅうり：1本</li><li>ミニトマト：5個</li><li>マヨネーズ：大さじ3～5</li><li>塩、こしょう：適量 </li>*/}
                                             <ul 
                                                 contentEditable
-                                                style={{ border: 'none', outline: 'none', lineHeight: '1.5', width: "100%" }}
+                                                style={{ border: '', outline: 'none', lineHeight: '1.5', width: "100%" }}
                                                 dangerouslySetInnerHTML={{ __html: recipeclub && recipeclub.ingredient ? recipeclub.ingredient : '' }}
                                                 ref={ingredientRef}
-                                                placeholder="じゃがいも：３個"
                                                 className='editable-list'
                                             />
                                         </div>
@@ -408,35 +477,47 @@ const RecipeclubDetail = () => {
                                                 </div>
                                                 <div className="recipe_glicoitem_content_main">
                                                     <div className="recipe_glicoitem_title"><span>クラッツ＜ペッパーベーコン＞</span>
-                                                        <div className="brandLink">
-                                                            <a href="https://www.glico.com/jp/product/snack_biscuit_cookie/cratz/?=recipeclub"
-                                                                target="_blank">〉ブランドサイトへ</a>
-                                                        </div>
+                                                        <Flex direction="row" justifyContent="flex-end">
+                                                            <div
+                                                                contentEditable
+                                                                ref={brandsiteUrlRef}
+                                                                className="brandsiteRef"
+                                                            />
+                                                            <div>
+                                                                <Button variation="warning" onClick={insertBrandsiteLink} size="small">リンク確認・挿入</Button>
+                                                            </div>
+                                                        </Flex>
                                                     </div>
                                                     <div className="recipe_glicoitem_desc">
                                                         カリッと噛むたびに、ブラックペッパーをきかせたベーコンの濃厚な旨みがジュッワと溢れ出し、ビールの味を引き立てます。90％のビールユーザーに「ビールが進む」と評価されたおつまみスナックです。
                                                     </div>
                                                     <div className="recipe_glicoitem_links">
-                                                        <ul>
+                                                        <ul style={{ listStyle: 'none' }}>
                                                             <li>
-                                                                <p className="m-btnModule02  tagBtn"><a
+                                                                <p className="m-btnModule02  tagBtn">
+                                                                    <a
                                                                     href="https://shop.glico.com/products/gh-6716744?&checked=1?=recipeclub"
                                                                     target="_blank"><span>ご購入はこちら<br className="tagBtnbr" />
                                                                         （ダイレクトショップ）</span></a>
                                                                 </p>
-                                                            </li>
+                                                                <Button variation="warning" onClick={insertDirectshopLink} size="small">リンク確認・挿入</Button>
+                                                                </li>
                                                             <li>
-                                                                <p className="m-btnModule02  tagBtn"><a href="https://amzn.to/3pIUmZ7"
+                                                                <p className="m-btnModule02  tagBtn">
+                                                                    <a href="https://amzn.to/3pIUmZ7"
                                                                     target="_blank"><span>ご購入はこちら<br className="tagBtnbr" />
                                                                         （Amazon）</span></a>
                                                                 </p>
+                                                                <Button variation="warning" onClick={insertAmazonLink} size="small">リンク確認・挿入</Button>
                                                             </li>
                                                             <li>
-                                                                <p className="m-btnModule02  tagBtn"><a
+                                                                <p className="m-btnModule02  tagBtn">
+                                                                    <a
                                                                     href="https://lohaco.yahoo.co.jp/store/h-lohaco/item/j672363/?=recipeclub"
                                                                     target="_blank"><span>ご購入はこちら<br className="tagBtnbr" />
                                                                         （LOHACO）</span></a>
                                                                 </p>
+                                                                <Button variation="warning" onClick={insertLohacoLink} size="small">リンク確認・挿入</Button>
                                                             </li>
                                                         </ul>
                                                     </div>

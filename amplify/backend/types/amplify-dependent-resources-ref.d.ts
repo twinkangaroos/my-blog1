@@ -16,5 +16,11 @@ export type AmplifyDependentResourcesAttributes = {
       "UserPoolId": "string",
       "UserPoolName": "string"
     }
+  },
+  "storage": {
+    "s3nextblog2storage9f85914b": {
+      "BucketName": "string",
+      "Region": "string"
+    }
   }
 }

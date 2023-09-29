@@ -18,12 +18,20 @@ export declare type RecipeclubUpdateFormInputValues = {
     subtitle?: string;
     main_image?: string;
     ingredient?: string;
+    brandsite_url?: string;
+    directshop_url?: string;
+    amazon_url?: string;
+    lohaco_url?: string;
 };
 export declare type RecipeclubUpdateFormValidationValues = {
     title?: ValidationFunction<string>;
     subtitle?: ValidationFunction<string>;
     main_image?: ValidationFunction<string>;
     ingredient?: ValidationFunction<string>;
+    brandsite_url?: ValidationFunction<string>;
+    directshop_url?: ValidationFunction<string>;
+    amazon_url?: ValidationFunction<string>;
+    lohaco_url?: ValidationFunction<string>;
 };
 export declare type PrimitiveOverrideProps<T> = Partial<T> & React.DOMAttributes<HTMLDivElement>;
 export declare type RecipeclubUpdateFormOverridesProps = {
@@ -32,6 +40,10 @@ export declare type RecipeclubUpdateFormOverridesProps = {
     subtitle?: PrimitiveOverrideProps<TextFieldProps>;
     main_image?: PrimitiveOverrideProps<TextFieldProps>;
     ingredient?: PrimitiveOverrideProps<TextFieldProps>;
+    brandsite_url?: PrimitiveOverrideProps<TextFieldProps>;
+    directshop_url?: PrimitiveOverrideProps<TextFieldProps>;
+    amazon_url?: PrimitiveOverrideProps<TextFieldProps>;
+    lohaco_url?: PrimitiveOverrideProps<TextFieldProps>;
 } & EscapeHatchProps;
 export declare type RecipeclubUpdateFormProps = React.PropsWithChildren<{
     overrides?: RecipeclubUpdateFormOverridesProps | undefined | null;

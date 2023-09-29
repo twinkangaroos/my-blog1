@@ -4,6 +4,10 @@ type Recipeclub @model @auth(rules: [{allow: public}]) {
   subtitle: String
   main_image: String
   ingredient: String
+  brandsite_url: String
+  directshop_url: String
+  amazon_url: String
+  lohaco_url: String
 }
 
 type LikeComment @model @auth(rules: [{allow: public}]) {
