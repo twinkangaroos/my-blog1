@@ -8,6 +8,9 @@ Amplify.configure({...awsconfig, ssr: true});
 import { I18n } from 'aws-amplify'
 import { Authenticator, translations } from '@aws-amplify/ui-react';
 
+// 独自CSS
+import '../css/stylesheet.css'; 
+
 // https://ui.docs.amplify.aws/react/connected-components/authenticator/customization#internationalization-i18n
 I18n.putVocabularies(translations);
 I18n.setLanguage('ja');

@@ -1,4 +1,5 @@
 import '@aws-amplify/ui-react/styles.css';
+import styles from '../../styles/recipieclub.module.css'
 import { useRouter } from 'next/router'
 import { DataStore, SortDirection } from '@aws-amplify/datastore';
 import { Post, PostList } from '../../models';
@@ -435,21 +436,152 @@ const PostComponent = () => {
                         <div className="l-mqWrapper">
                             <ol>
                                 <li><Link href="/"><span>with Glico</span></Link></li>
-                                <li><Link href="/"><span>おしゃべりカフェ</span></Link></li>
+                                <li><Link href="/"><span>レシピクラブ</span></Link></li>
                             </ol>
                         </div>
                     </div>
                 </div>
                 <div className="c-pageTitleSet01 type03">
-                    <div className="bgArea" style={{ backgroundImage: `url('/image/cafe_page_title01.png')` }}></div>
-                    <div className="bgAreaSp" style={{ backgroundImage: `url('/image/cafe_page_title01_sp.png')` }}></div>
+                    <div className="bgArea" style={{ backgroundImage: `url('../image/recipe_page_title01.png')` }}></div>
+                    <div className="bgAreaSp" style={{ backgroundImage: `url('../image/recipe_page_title01_sp.png'` }}></div>
                     <div className="titleArea">
-                        <h1 className="m-pageTitle01"><span className="is-large">おしゃべりカフェ</span><span className="is-small">Talking
-                            Cafe</span><span className="townImage is-right"
-                                style={{ backgroundImage: `url('/image/cafe_town01.png')` }}></span>
+                        <h1 className="m-pageTitle01"><span class="is-large">レシピクラブ</span><span class="is-small">Recipe Club</span><span
+                            className="townImage is-right" style={{ backgroundImage: `url('../image/recipe_town01.png'` }}></span>
                         </h1>
                     </div>
                 </div>
+
+
+                <div className={`${styles['l-bgBlock01']} ${styles['is-bgImage']} ${styles['bg-right']}`} data-page-has-comment="/withglico/forum/comment.jsp"
+                    data-get-cmt-text="/withglico/forum/content.jsp" data-check-login="/withglico/member/checklogin.jsp"
+                    data-like-and-cmt="/withglico/forum/like.jsp?id=50702&type=1" data-like-action="/withglico/forum/like.jsp"
+                    data-delete-img-action="/withglico/forum/comment.jsp?action=deleteimage"
+                    data-delete-cmt-action="/withglico/forum/comment.jsp?action=delete" data-id-page-comment="50702"
+                    data-type-page="1">
+                    <div className="l-componentBlock" data-main-content="">
+                        <div className="l-smallContentsWidth">
+                            <div className="l-mqWrapper">
+                                <div className="l-columnBlock">
+                                    <h2 className="m-pageTitle01"><span className="is-large">【クラッツで作る】クラッツ入りポテトサラダ</span></h2>
+                                    <div className={styles.recipe_shoukai}>宅飲みにおすすめのメニュー♪</div>
+                                    
+                                    <div className={styles.recipe_img_zai}>
+                                        <div className={`${styles.recipe_img_zai} ${styles['c-imageSet01']}`}>
+                                            <div className={`${styles.recipe_img_zai} ${styles['imageBlock']}`}>
+                                                <div className="m-imageModule01">
+                                                    <p className="image"><img src="https://with.glico.com/image.jsp?id=52148" alt="イメージ" align="middle" />
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div className={`${styles.recipe_img_zai} ${styles['recipe_zairyo']}`}>
+                                            <div className={`${styles.recipe_img_zai} ${styles['recipe_zairyo']}`}><span className={styles.recipe_zairyo_title}>材料</span>　</div>
+                                            <ul>
+                                                <li><span style={{ fontSize: '16px', letterSpacing: '0.04em' }}>クラッツ（お好みの味で）：適量</span><br />
+                                                </li>
+                                                <li>じゃがいも：3個</li>
+                                                <li>きゅうり：1本</li>
+                                                <li>ミニトマト：5個</li>
+                                                <li>マヨネーズ：大さじ3～5</li>
+                                                <li>塩、こしょう：適量 </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+
+                                    <div className="recipe_glicoitem">
+                                        <div>
+                                            <div className="recipe_glicoitem_head">
+                                                レシピに使用している商品はこちら
+                                            </div>
+                                            <div className="recipe_glicoitem_content">
+                                                <div className="recipe_glicoitem_content_img">
+                                                    <img src="https://with.glico.com/image.jsp?id=50700" alt="gi_bisco1" />
+                                                </div>
+                                                <div className="recipe_glicoitem_content_main">
+                                                    <div className="recipe_glicoitem_title"><span>クラッツ＜ペッパーベーコン＞</span>
+                                                        <div className="brandLink">
+                                                            <a href="https://www.glico.com/jp/product/snack_biscuit_cookie/cratz/?=recipeclub"
+                                                                target="_blank">〉ブランドサイトへ</a>
+                                                        </div>
+                                                    </div>
+                                                    <div className="recipe_glicoitem_desc">
+                                                        カリッと噛むたびに、ブラックペッパーをきかせたベーコンの濃厚な旨みがジュッワと溢れ出し、ビールの味を引き立てます。90％のビールユーザーに「ビールが進む」と評価されたおつまみスナックです。
+                                                    </div>
+                                                    <div className="recipe_glicoitem_links">
+                                                        <ul>
+                                                            <li>
+                                                                <p className="m-btnModule02  tagBtn"><a
+                                                                    href="https://shop.glico.com/products/gh-6716744?&checked=1?=recipeclub"
+                                                                    target="_blank"><span>ご購入はこちら<br className="tagBtnbr" />
+                                                                        （ダイレクトショップ）</span></a>
+                                                                </p>
+                                                            </li>
+                                                            <li>
+                                                                <p className="m-btnModule02  tagBtn"><a href="https://amzn.to/3pIUmZ7"
+                                                                    target="_blank"><span>ご購入はこちら<br className="tagBtnbr" />
+                                                                        （Amazon）</span></a>
+                                                                </p>
+                                                            </li>
+                                                            <li>
+                                                                <p className="m-btnModule02  tagBtn"><a
+                                                                    href="https://lohaco.yahoo.co.jp/store/h-lohaco/item/j672363/?=recipeclub"
+                                                                    target="_blank"><span>ご購入はこちら<br className="tagBtnbr" />
+                                                                        （LOHACO）</span></a>
+                                                                </p>
+                                                            </li>
+                                                        </ul>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div className="recipe_method">
+                                        <div className="recipe_method_title">作り方</div>
+                                        <ul>
+                                            <li>
+                                                <p className="kouteijun"><span>1</span></p>
+                                                <div className="recipe_method_detail">
+                                                    きゅうりは輪切りにし、塩少々（分量外）で揉んで5分おき、水気を絞る。じゃがいもはひと口サイズに切る。ミニトマトは4等分のくし切りにする。</div>
+                                            </li>
+                                            <li>
+                                                <p className="kouteijun"><span>2</span></p>
+                                                <div className="recipe_method_detail">
+                                                    じゃがいもを耐熱容器に入れ、水小さじ1（分量外）をふってふんわりラップする。電子レンジ600Wで5分ほど加熱し、マッシャーやフォークなどで潰す。</div>
+                                            </li>
+                                            <li>
+                                                <p className="kouteijun">3</p>
+                                                <div className="recipe_method_detail">➁の粗熱がとれたら、クラッツ・①・マヨネーズを和え、塩・こしょうで味を整える。
+
+                                                </div>
+                                            </li>
+                                        </ul>
+                                    </div>
+
+                                    <div className="recipe_memo">
+                                        <div className="recipe_memo_title">
+                                            ひとことメモ
+                                        </div>
+                                        <div className="recipe_memo_content"><span
+                                            style={{ fontSize: '16px', letterSpacing: '0.04em' }}>※材料のアレルゲンについては、ご確認の上でご調理ください。</span><span
+                                            style={{ fontSize: '16px', letterSpacing: '0.04em', whiteSpace: 'pre' }}> </span><br />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+
+
+
+
+
+
+
 
                 <Card>
                     <Flex direction="column" className='l-smallContentsWidth'>
@@ -565,7 +697,7 @@ const PostComponent = () => {
                                 }
                             </Flex>
                         </Flex>
-                        
+
                         <Flex direction="column" alignItems="flex-start" style={{ marginTop: '20px' }}>
                             {/***** 記事に対する（自分の）コメントエリア *****/}
                             <h3 className='m-borderBottomTitle01' style={{ width: '100%' }}>この記事にコメントする</h3>

@@ -11,13 +11,13 @@ const HeaderAdmin = () => {
 
   return (
     <>
-      <Flex direction="row" gap="1rem">
+      <Flex direction="row" gap="1rem" alignItems="center">
         <Heading level={5}><Link href="/">Twin kangaroos</Link></Heading>
         {
           route === 'authenticated' ?
           <Flex alignItems="baseline">
-              <Flex style={{fontSize: '12px'}}>{user.attributes.nickname} がログイン中...</Flex> 
-              <Button variation="link" onClick={signOut} size="small" style={{fontSize: '12px'}}>
+              <Flex style={{fontSize: '12px'}}>ようこそ、{user.attributes.nickname} さん！</Flex> 
+              <Button variation="default" onClick={signOut} size="small" style={{fontSize: '12px'}}>
                   ログアウト
               </Button>
           </Flex>
