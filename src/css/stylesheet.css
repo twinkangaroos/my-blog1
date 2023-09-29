@@ -19218,6 +19218,14 @@ header.c-comHeaderTop01 .menuBlock .navBtn .navBtnText {
 }
 
 
+
+
+
+
+
+
+
+
 /* 2023/9/28 for recipieclub */
 @import url(https://fonts.googleapis.com/icon?family=Material%20Icons);
 
@@ -19302,7 +19310,7 @@ header.c-comHeaderTop01 .menuBlock .navBtn .navBtnText {
 .recipe_glicoitem>div .recipe_glicoitem_content_img {
   width: 30%;
   display: flex;
-  align-items: start;
+  align-items: flex-start;
   margin-top: 20px;
 }
 
@@ -19930,3 +19938,5 @@ header.c-comHeaderTop01 .menuBlock .navBtn .navBtnText {
     font-size: 2.3rem;
   }
 }
+
+

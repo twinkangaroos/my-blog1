@@ -6,6 +6,40 @@ import { LazyLoading, LazyLoadingDisabled } from "@aws-amplify/datastore";
 
 
 
+type EagerRecipeclub = {
+  readonly [__modelMeta__]: {
+    identifier: ManagedIdentifier<Recipeclub, 'id'>;
+    readOnlyFields: 'createdAt' | 'updatedAt';
+  };
+  readonly id: string;
+  readonly title?: string | null;
+  readonly subtitle?: string | null;
+  readonly main_image?: string | null;
+  readonly ingredient?: string | null;
+  readonly createdAt?: string | null;
+  readonly updatedAt?: string | null;
+}
+
+type LazyRecipeclub = {
+  readonly [__modelMeta__]: {
+    identifier: ManagedIdentifier<Recipeclub, 'id'>;
+    readOnlyFields: 'createdAt' | 'updatedAt';
+  };
+  readonly id: string;
+  readonly title?: string | null;
+  readonly subtitle?: string | null;
+  readonly main_image?: string | null;
+  readonly ingredient?: string | null;
+  readonly createdAt?: string | null;
+  readonly updatedAt?: string | null;
+}
+
+export declare type Recipeclub = LazyLoading extends LazyLoadingDisabled ? EagerRecipeclub : LazyRecipeclub
+
+export declare const Recipeclub: (new (init: ModelInit<Recipeclub>) => Recipeclub) & {
+  copyOf(source: Recipeclub, mutator: (draft: MutableModel<Recipeclub>) => MutableModel<Recipeclub> | void): Recipeclub;
+}
+
 type EagerLikeComment = {
   readonly [__modelMeta__]: {
     identifier: ManagedIdentifier<LikeComment, 'id'>;

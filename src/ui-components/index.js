@@ -5,6 +5,8 @@
  **************************************************************************/
 
 export { default as studioTheme } from "./studioTheme";
+export { default as RecipeclubCreateForm } from "./RecipeclubCreateForm";
+export { default as RecipeclubUpdateForm } from "./RecipeclubUpdateForm";
 export { default as LikeCommentCreateForm } from "./LikeCommentCreateForm";
 export { default as LikeCommentUpdateForm } from "./LikeCommentUpdateForm";
 export { default as UserCreateForm } from "./UserCreateForm";

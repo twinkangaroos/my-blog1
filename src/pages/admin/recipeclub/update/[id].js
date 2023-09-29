@@ -2,22 +2,23 @@ import '@aws-amplify/ui-react/styles.css';
 //import styles from "../../../../styles/editable.module.css"
 import { useRouter } from 'next/router'
 import { DataStore, SortDirection } from '@aws-amplify/datastore';
-import { Post, PostList } from '../../../../models';
+//import { Post, PostList } from '../../../../models';
+import { Recipeclub } from '../../../../models';
 import { useState, useEffect } from 'react';
 import { Card, View, Flex, Button, useTheme, Link, Loader, RadioGroupField, Radio } from '@aws-amplify/ui-react';
 import { useRef } from 'react';
 import { Authenticator } from '@aws-amplify/ui-react';
 import HeaderAdmin from "../../../HeaderAdmin"
 
-const PostDetail = () => {
-    const [post, setPost] = useState("")
-    const [post_list, setPostList] = useState([])
+const RecipeclubDetail = () => {
+    const [recipeclub, setRecipeclub] = useState("")
+    //const [post_list, setPostList] = useState([])
     const [id, setId] = useState("")
-    //const [post_list_flag, setPostListFlag] = useState(false)
-    const [focusOnNextAdd, setFocusOnNextAdd] = useState(true); // 要素追加時にフォーカスを当てるかのフラグ
+    //const [focusOnNextAdd, setFocusOnNextAdd] = useState(true); // 要素追加時にフォーカスを当てるかのフラグ
     const divRefs = useRef([]); // contenteditableの参照を保持する配列
     const titleRef = useRef(null); // title要素のrefを作成
-    const [selectedElementIndex, setSelectedElementIndex] = useState(-1);
+    const subtitleRef = useRef(null); // subtitle要素のrefを作成
+    const ingredientRef = useRef(null);
     const [contents, setContents] = useState(['']); // 各要素のvalueを保持する配列（移動時に必要。Modelは書き込み不可のため）
 
     // パスパラメータからidを取得
@@ -53,44 +54,43 @@ const PostDetail = () => {
     // 初期ロード時の処理
     useEffect(() => {
         doInit()
-    //}, [param_id, post_list_flag])
     }, [param_id])
 
     // 要素追加時
-    useEffect(() => {
-        if (focusOnNextAdd && divRefs.current.length > 0) {
-            // 新しく追加された要素にフォーカスを当てる
-            if (divRefs.current[divRefs.current.length - 1]) {
-                divRefs.current[divRefs.current.length - 1].focus()
-                setFocusOnNextAdd(false) // フォーカスを当てるフラグをfalseに設定
-            }
-        }
-    }, [focusOnNextAdd, post_list])
+    //useEffect(() => {
+    //    if (focusOnNextAdd && divRefs.current.length > 0) {
+    //        // 新しく追加された要素にフォーカスを当てる
+    //        if (divRefs.current[divRefs.current.length - 1]) {
+    //            divRefs.current[divRefs.current.length - 1].focus()
+    //            setFocusOnNextAdd(false) // フォーカスを当てるフラグをfalseに設定
+    //        }
+    //    }
+    //}, [focusOnNextAdd, post_list])
     
     // 初期処理
     async function doInit() {
         if (param_id) {
             setId(param_id)
-            // Post取得
-            const post_result = await DataStore.query(Post, (c) => c.id.eq(param_id))
-            if (post_result && post_result.length > 0) {
-                setPost(post_result[0])
-                console.log("First success in taking Post.", post_result[0])
+            // Recipeclub取得
+            const recipe_result = await DataStore.query(Recipeclub, (c) => c.id.eq(param_id))
+            if (recipe_result && recipe_result.length > 0) {
+                setRecipeclub(recipe_result[0])
+                console.log("First success in taking Recipeclub.", recipe_result[0])
 
                 // PostList取得
-                const post_list_result = await DataStore.query(PostList, (c) => c.post_id.eq(param_id), {
-                    sort:(s) => s.sort(SortDirection.ASCENDING),
-                })
-                if (post_list_result && post_list_result.length > 0) {
-                    // Model形式で保持（例：[0]Model {id: '', ..} [1]Model {id: '', ..}）
-                    setPostList(post_list_result)
-                    // PostList取得後、初期ロード実行？意味不明なのでとりあえずコメントしておく。
-                    //setPostListFlag(true)
-                    // DBのpost_listをテキストで保持
-                    const updatedContents = post_list_result.map(item => item.content)
-                    setContents(updatedContents)
-                    console.log("First success in taking PostList.")
-                }
+                //const post_list_result = await DataStore.query(PostList, (c) => c.post_id.eq(param_id), {
+                //    sort:(s) => s.sort(SortDirection.ASCENDING),
+                //})
+                //if (post_list_result && post_list_result.length > 0) {
+                //    // Model形式で保持（例：[0]Model {id: '', ..} [1]Model {id: '', ..}）
+                //    setPostList(post_list_result)
+                //    // PostList取得後、初期ロード実行？意味不明なのでとりあえずコメントしておく。
+                //    //setPostListFlag(true)
+                //    // DBのpost_listをテキストで保持
+                //    const updatedContents = post_list_result.map(item => item.content)
+                //    setContents(updatedContents)
+                //    console.log("First success in taking PostList.")
+                //}
             } else {
                 console.log("Error when retrieving DB during doInit().....")
             }
@@ -106,81 +106,93 @@ const PostDetail = () => {
                     alert("タイトルを入力してください")
                     return
                 }
+                if (!subtitleRef.current.innerText) {
+                    alert("サブタイトルを入力してください")
+                    return
+                }
+                if (!ingredientRef.current.innerText) {
+                    alert("材料を入力してください")
+                    return
+                }
                 const updatedTitle = titleRef.current.innerText
+                const updatedSubTitle = subtitleRef.current.innerText
+                const updatedIngredient = ingredientRef.current.innerHTML
                 const currentDate = new Date() // 2023-08-09T09:02:09.955Z
                 // AWSDate 形式に変換
                 const awsDate = currentDate.toISOString().split('T')[0]
                 
-                // Post再取得
-                const current_post = await DataStore.query(Post, (c) => c.id.eq(id))
-                if (current_post && current_post.length > 0) {
-                    console.log("Success in taking Post immediately.", current_post[0])
+                // Recipeclub再取得
+                const current_recipeclub = await DataStore.query(Recipeclub, (c) => c.id.eq(id))
+                if (current_recipeclub && current_recipeclub.length > 0) {
+                    console.log("Success in taking Recipeclub immediately.", current_recipeclub[0])
                     
-                    // Postの更新
-                    const updatedPost = await DataStore.save(
-                        Post.copyOf(
-                            current_post[0], 
+                    // Recipeclubの更新
+                    const updatedRecipeclub = await DataStore.save(
+                        Recipeclub.copyOf(
+                            current_recipeclub[0], 
                             updated => {
                                 updated.title = updatedTitle
+                                updated.subtitle = updatedSubTitle
+                                updated.ingredient = updatedIngredient
                                 updated.show_date = awsDate
                             }
                         )
                     )
-                    console.log("Post successfully updated.")
+                    console.log("Recipeclub successfully updated.")
                 } else {
-                    console.log("Error when retrieving Post before Updated.....")
+                    console.log("Error when retrieving Recipeclub before Updated.....")
                     return
                 }
                 
                 // PostListの全削除（※post_idで一括削除するとトランザクションがおかしくなる？）
-                await DataStore.delete(PostList, (post_list) => post_list.post_id.eq(id))
-                console.log("All PostList successfully deleted.")
-                
+                //await DataStore.delete(PostList, (post_list) => post_list.post_id.eq(id))
+                //console.log("All PostList successfully deleted.")
+                //
                 // PostListの再作成
-                if (post_list && post_list.length > 0) {
-                    // TODO: contentsを利用すればよいはず？
-                    // contenteditableの内容を取得（※追加したてのnullの考慮要）
-                    const updatedContent = post_list.map((pl, index) => {
-                        const el = divRefs.current[index];
-                        return el ? el.innerText : '';
-                    })
-                    
-                    // TODO: 段落が多くなれば途中で処理が切れてしまう？
-                    // PostListの再作成
-                    let i = 0
-                    for (const pl of post_list) {
-                        const updatedContentValue = updatedContent[i] // 更新後のcontentの値を取得
-                        await DataStore.save(
-                            new PostList({
-                                "content": updatedContentValue,
-                                "type": pl.type,
-                                "sort": i,
-                                "post_id": id,
-                            })
-                        )
-                        i++
-                    }
-                    console.log("All PostList successfully created.")
-                }
+                //if (post_list && post_list.length > 0) {
+                //    // TODO: contentsを利用すればよいはず？
+                //    // contenteditableの内容を取得（※追加したてのnullの考慮要）
+                //    const updatedContent = post_list.map((pl, index) => {
+                //        const el = divRefs.current[index];
+                //        return el ? el.innerText : '';
+                //    })
+                //    
+                //    // TODO: 段落が多くなれば途中で処理が切れてしまう？
+                //    // PostListの再作成
+                //    let i = 0
+                //    for (const pl of post_list) {
+                //        const updatedContentValue = updatedContent[i] // 更新後のcontentの値を取得
+                //        await DataStore.save(
+                //            new PostList({
+                //                "content": updatedContentValue,
+                //                "type": pl.type,
+                //                "sort": i,
+                //                "post_id": id,
+                //            })
+                //        )
+                //        i++
+                //    }
+                //    console.log("All PostList successfully created.")
+                //}
                 
-                // Post再取得（※Postはこの時点で取得してもうまくいかない模様）
-                const p_result = await DataStore.query(Post, (c) => c.id.eq(id))
-                if (p_result && p_result.length > 0) {
-                    setPost(p_result[0])
-                    console.log("Success in taking Post again.", p_result[0])
+                // Recipeclub再取得（※Recipeclubはこの時点で取得してもうまくいかない模様）
+                const r_result = await DataStore.query(Recipeclub, (c) => c.id.eq(id))
+                if (r_result && r_result.length > 0) {
+                    setRecipeclub(r_result[0])
+                    console.log("Success in taking Recipeclub again.", r_result[0])
                 } else {
                     console.log("Error when retrieving Post after Updated.....")
                     return
                 }
                 // PostList再取得
-                const post_list_result = await DataStore.query(PostList, (c) => c.post_id.eq(id), {
-                    sort:(s) => s.sort(SortDirection.ASCENDING),
-                })
+                //const post_list_result = await DataStore.query(PostList, (c) => c.post_id.eq(id), {
+                //    sort:(s) => s.sort(SortDirection.ASCENDING),
+                //})
                 
-                if (post_list_result && post_list_result.length > 0) {
-                    setPostList(post_list_result)
-                    console.log("Success in taking PostList again.")
-                }
+                //if (post_list_result && post_list_result.length > 0) {
+                //    setPostList(post_list_result)
+                //    console.log("Success in taking PostList again.")
+                //}
                 alert("更新完了しました。")
             } else {
                 console.log("記事が見つかりません")
@@ -197,14 +209,14 @@ const PostDetail = () => {
         try {
             if (id) {
                 // テーブルB（PostList）の削除
-                await DataStore.delete(PostList, (post_list) => post_list.post_id.eq(id))
+                //await DataStore.delete(PostList, (post_list) => post_list.post_id.eq(id))
                 
-                // テーブルA（Post）の削除
-                await DataStore.delete(Post, id)
+                // テーブルA（Recipeclub）の削除
+                await DataStore.delete(Recipeclub, id)
 
                 alert("削除完了しました")
                 // ルーターを使用して遷移する
-                router.push(`/admin/postlist`)
+                router.push(`/admin/recipeclublist`)
             } else {
                 console.log("記事が見つかりません")
                 return
@@ -221,8 +233,8 @@ const PostDetail = () => {
         setFocusOnNextAdd(true); // フォーカスを当てるフラグをtrueに設定
     }
     
-    // h1タイトル入力時、エンターキーを無効化
-    const handleKeyDownH1 = (e) => {
+    // h2タイトル入力時、エンターキーを無効化
+    const handleKeyDownEnter = (e) => {
         if (e.key === 'Enter') {
             e.preventDefault(); // Enterキーのデフォルトの改行処理を防ぐ
         }
@@ -298,25 +310,13 @@ const PostDetail = () => {
                 >
                     <Button variation="link" size="large"><Link href="/admin/postlist">一覧に戻る</Link></Button>
                     {
-                        post ?
+                        recipeclub ?
                         <Button variation="warning" onClick={onUClick} size="large">更新する</Button>
                         :
                         ''
                     }
                 </Flex>
-                {/*
-                <RadioGroupField
-                    label="記事のタイプ"
-                    name="article_type"
-                    direction="row"
-                    style={{ marginBottom: '20px' }}
-                    // TODO:
-                    defaultValue="basic"
-                >
-                    <Radio value="basic">基本タイプ</Radio>
-                    <Radio value="link">リンクタイプ</Radio>
-                </RadioGroupField>
-                */}
+               
                 <div className="c-breadcrumbsSet01">
                     <div className="l-contentsWidth">
                         <div className="l-mqWrapper">
@@ -331,32 +331,32 @@ const PostDetail = () => {
                     <div className="bgArea" style={{ backgroundImage: `url('../../../image/recipe_page_title01.png')` }}></div>
                     <div className="bgAreaSp" style={{ backgroundImage: `url('../../../image/recipe_page_title01_sp.png'` }}></div>
                     <div className="titleArea">
-                        <h1 className="m-pageTitle01"><span class="is-large">レシピクラブ</span><span class="is-small">Recipe Club</span><span
+                        <h1 className="m-pageTitle01"><span className="is-large">レシピクラブ</span><span className="is-small">Recipe Club</span><span
                             className="townImage is-right" style={{ backgroundImage: `url('../../../image/recipe_town01.png'` }}></span>
                         </h1>
                     </div>
                 </div>
 
 
-                <div class="l-bgBlock01 is-bgImage bg-right" data-page-has-comment="/withglico/forum/comment.jsp"
+                <div className="l-bgBlock01 is-bgImage bg-right" data-page-has-comment="/withglico/forum/comment.jsp"
                     data-get-cmt-text="/withglico/forum/content.jsp" data-check-login="/withglico/member/checklogin.jsp"
                     data-like-and-cmt="/withglico/forum/like.jsp?id=50702&type=1" data-like-action="/withglico/forum/like.jsp"
                     data-delete-img-action="/withglico/forum/comment.jsp?action=deleteimage"
                     data-delete-cmt-action="/withglico/forum/comment.jsp?action=delete" data-id-page-comment="50702"
                     data-type-page="1">
-                    <div class="l-componentBlock" data-main-content="">
-                        <div class="l-smallContentsWidth">
-                            <div class="l-mqWrapper">
-                                <div class="l-columnBlock">
+                    <div className="l-componentBlock" data-main-content="">
+                        <div className="l-smallContentsWidth">
+                            <div className="l-mqWrapper">
+                                <div className="l-columnBlock">
                                     {
-                                        post ?
+                                        recipeclub ?
                                         <h2
                                             contentEditable
                                             style={{ border: 'none', outline: 'none', lineHeight: '1.5', width: "100%" }}
-                                            dangerouslySetInnerHTML={{ __html: post && post.title ? post.title : '' }}
+                                            dangerouslySetInnerHTML={{ __html: recipeclub && recipeclub.title ? recipeclub.title : '' }}
                                             ref={titleRef} // refをtitle要素に紐付け
-                                            onKeyDown={handleKeyDownH1} // Enterキーの処理を行う
-                                            placeholder="記事タイトル"
+                                            onKeyDown={handleKeyDownEnter} // Enterキーの処理を行う
+                                            placeholder="レシピタイトル"
                                             className='is-large'
                                         />
                                         :
@@ -366,38 +366,34 @@ const PostDetail = () => {
                                     <div
                                         contentEditable 
                                         style={{ border: 'none', outline: 'none', lineHeight: '1.5', width: "100%" }}
-                                        dangerouslySetInnerHTML={{ __html: post && post.title ? post.title : '' }}
-                                        ref={titleRef} // refをtitle要素に紐付け
-                                        onKeyDown={handleKeyDownH1} // Enterキーの処理を行う
-                                        placeholder="記事タイトル"
+                                        dangerouslySetInnerHTML={{ __html: recipeclub && recipeclub.subtitle ? recipeclub.subtitle : '' }}
+                                        ref={subtitleRef}
+                                        onKeyDown={handleKeyDownEnter}
+                                        placeholder="サブタイトル"
                                         className="recipe_shoukai"
                                     />
 
-                                    <div class="recipe_img_zai">
-                                        <div class="c-imageSet01">
-                                            <div class="imageBlock">
-                                                <div class="m-imageModule01">
-                                                    <p class="image"><img src="https://with.glico.com/image.jsp?id=52148" alt="イメージ" align="middle" />
+                                    <div className="recipe_img_zai">
+                                        <div className="c-imageSet01">
+                                            <div className="imageBlock">
+                                                <div className="m-imageModule01">
+                                                    <p className="image"><img src="https://with.glico.com/image.jsp?id=52148" alt="イメージ" align="middle" />
                                                     </p>
                                                 </div>
                                             </div>
                                         </div>
 
-                                        <div class="recipe_zairyo">
+                                        <div className="recipe_zairyo">
                                             <div><span className="recipe_zairyo_title">材料</span>　1人分</div>
+                                            {/*<li>クラッツ（お好みの味で）：適量</li><li>じゃがいも：3個</li><li>きゅうり：1本</li><li>ミニトマト：5個</li><li>マヨネーズ：大さじ3～5</li><li>塩、こしょう：適量 </li>*/}
                                             <ul 
                                                 contentEditable
                                                 style={{ border: 'none', outline: 'none', lineHeight: '1.5', width: "100%" }}
-                                                //dangerouslySetInnerHTML={{ __html: post ? '<li>クラッツ（お好みの味で）：適量</li>' : '' }}
+                                                dangerouslySetInnerHTML={{ __html: recipeclub && recipeclub.ingredient ? recipeclub.ingredient : '' }}
+                                                ref={ingredientRef}
                                                 placeholder="じゃがいも：３個"
-                                            >
-                                                <li>クラッツ（お好みの味で）：適量</li>
-                                                <li>じゃがいも：3個</li>
-                                                <li>きゅうり：1本</li>
-                                                <li>ミニトマト：5個</li>
-                                                <li>マヨネーズ：大さじ3～5</li>
-                                                <li>塩、こしょう：適量 </li>
-                                            </ul>
+                                                className='editable-list'
+                                            />
                                         </div>
                                     </div>
 
@@ -486,135 +482,8 @@ const PostDetail = () => {
                     </div>
                 </div>
 
+                
 
-
-
-
-
-
-
-                <Card>
-                    <Flex direction="column" className='l-smallContentsWidth'>
-                        <Flex direction="column" alignItems="flex-start" className="ProseMirror note-common-styles__textnote-body">
-                            {
-                                post ?
-                                <h1
-                                    contentEditable
-                                    style={{ border: 'none', outline: 'none', lineHeight: '1.5', width: "100%" }}
-                                    dangerouslySetInnerHTML={{ __html: post && post.title ? post.title : '' }}
-                                    ref={titleRef} // refをtitle要素に紐付け
-                                    onKeyDown={handleKeyDownH1} // Enterキーの処理を行う
-                                    placeholder="記事タイトル"
-                                    className='m-bgTitle01'
-                                />
-                                :
-                                ''
-                            }
-                            {
-                                post_list.length > 0 ?
-                                post_list.map((postItem, index) => {
-                                    // 上に移動ボタン
-                                    const renderUpElement = (index) => {
-                                        if (index > 0) {
-                                            return (
-                                                <Button onClick={() => handleMoveUp(index)} className="amplify-button amplify-field-group__control amplify-button--default amplify-button--small">↑</Button>
-                                            )
-                                        } else {
-                                            return (
-                                                <Button isDisabled={true} className="amplify-button amplify-field-group__control amplify-button--default amplify-button--small amplify-button--disabled">↑</Button>
-                                            )
-                                        }
-                                    }
-                                    // 下に移動ボタン
-                                    const renderDownElement = (index) => {
-                                        if (index < post_list.length - 1) {
-                                            return (
-                                                <Button onClick={() => handleMoveDown(index)} className="amplify-button amplify-field-group__control amplify-button--default amplify-button--small">↓</Button>
-                                            )
-                                        } else {
-                                            return (
-                                                <Button isDisabled={true} className="amplify-button amplify-field-group__control amplify-button--default amplify-button--small amplify-button--disabled">↓</Button>
-                                            )
-                                        }
-                                    }
-                                    if (postItem.type === "div") {
-                                        return (
-                                            <Flex key={index + "_head"} direction="row" width={'100%'}>
-                                                <div
-                                                    key={index}
-                                                    contentEditable
-                                                    style={{ border: 'none', outline: 'none', lineHeight: '1.5', width: '100%' }}
-                                                    dangerouslySetInnerHTML={{ __html: contents[index] ? contents[index].replace(/\n/g, '<br />') : '' }}
-                                                    ref={el => (divRefs.current[index] = el)}
-                                                    onKeyDown={e => handleKeyDown(e, index)}
-                                                    //onClick={() => setSelectedElementIndex(index)}
-                                                />
-                                                <Flex>
-                                                    {renderUpElement(index)}
-                                                    {renderDownElement(index)}
-                                                </Flex>
-                                            </Flex>
-                                        )
-                                    } else if (postItem.type === "h2") {
-                                        return (
-                                            <Flex key={index + "_head"} direction="row" width={'100%'}>
-                                                <h2
-                                                    key={index}
-                                                    contentEditable
-                                                    style={{ border: 'none', outline: 'none', lineHeight: '1.5', width: '100%' }}
-                                                    dangerouslySetInnerHTML={{ __html: contents[index] ? contents[index].replace(/\n/g, '<br />') : '' }}
-                                                    ref={el => (divRefs.current[index] = el)}
-                                                    onKeyDown={e => handleKeyDown(e, index)}
-                                                />
-                                                <Flex>
-                                                    {renderUpElement(index)}
-                                                    {renderDownElement(index)}
-                                                </Flex>
-                                            </Flex>
-                                        )
-                                    } else if (postItem.type === "h3") {
-                                        return (
-                                            <Flex key={index + "_head"} direction="row" width={'100%'}>
-                                                <h3
-                                                    key={index}
-                                                    contentEditable
-                                                    style={{ border: 'none', outline: 'none', lineHeight: '1.5', width: '100%' }}
-                                                    dangerouslySetInnerHTML={{ __html: contents[index] ? contents[index].replace(/\n/g, '<br />') : '' }}
-                                                    ref={el => (divRefs.current[index] = el)}
-                                                    onKeyDown={e => handleKeyDown(e, index)}
-                                                />
-                                                <Flex>
-                                                    {renderUpElement(index)}
-                                                    {renderDownElement(index)}
-                                                </Flex>
-                                            </Flex>
-                                        )
-                                    }
-                                })
-                                :
-                                ''
-                            }
-                            {
-                                post ?
-                                <Flex direction="row" alignItems="flex-end" style={{ marginTop: '20px' }}>
-                                    <Button variation="default" onClick={() => handleAddElement("h2")} size="large" style={{height: '50px', fontWeight: 'bold'}}>大見出しの追加</Button>
-                                    <Button variation="default" onClick={() => handleAddElement("h3")} size="large" style={{height: '40px'}}>小見出しの追加</Button>
-                                    <Button variation="default" onClick={() => handleAddElement("div")} size="large" style={{height: '30px'}}>段落の追加</Button>
-                                </Flex>
-                                :
-                                ''
-                            }
-                        </Flex>
-                        {
-                            post ?
-                            <Flex justifyContent="flex-end" style={{ fontSize: '12px' }}>
-                                <Link href="#" onClick={onDClick}>記事を削除する</Link>
-                            </Flex>
-                            :
-                            ''
-                        }
-                    </Flex>
-                </Card>
             </View>
         </>
         )}
@@ -623,4 +492,4 @@ const PostDetail = () => {
     )
 }
 
-export default PostDetail
+export default RecipeclubDetail

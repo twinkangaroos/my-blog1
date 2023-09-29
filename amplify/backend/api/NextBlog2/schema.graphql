@@ -1,3 +1,11 @@
+type Recipeclub @model @auth(rules: [{allow: public}]) {
+  id: ID!
+  title: String
+  subtitle: String
+  main_image: String
+  ingredient: String
+}
+
 type LikeComment @model @auth(rules: [{allow: public}]) {
   id: ID!
   comment_id: String
