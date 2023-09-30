@@ -4,7 +4,7 @@ import { useRouter } from 'next/router'
 import { DataStore, SortDirection } from '@aws-amplify/datastore';
 import { Recipeclub } from '../../../../models';
 import { useState, useEffect } from 'react';
-import { Card, View, Flex, Button, useTheme, Link, Loader, RadioGroupField, Radio, Image } from '@aws-amplify/ui-react';
+import { View, Flex, Button, useTheme, Link, Image, Table, TableHead, TableRow, TableCell, TableBody } from '@aws-amplify/ui-react';
 import { useRef } from 'react';
 import { Authenticator } from '@aws-amplify/ui-react';
 import HeaderAdmin from "../../../HeaderAdmin";
@@ -16,6 +16,7 @@ const RecipeclubDetail = () => {
     //const [post_list, setPostList] = useState([])
     const [id, setId] = useState("")
     const [main_image_path, setMainImagePath] = useState(null);
+    const [main_image, setMainImage] = useState(null);
     const [brandsite_url, setBrandsiteUrl] = useState("")
     const [directshop_url, setDirectshopUrl] = useState("")
     const [amazon_url, setAmazonUrl] = useState("")
@@ -88,7 +89,7 @@ const RecipeclubDetail = () => {
                 setRecipeclub(recipe_result[0])
                 console.log("First success in taking Recipeclub.", recipe_result[0])
 
-                // 画像の取得
+                // メイン画像の取得
                 try {
                     const image_file = await Storage.get(recipe_result[0].main_image)
                     setMainImagePath(image_file)
@@ -96,11 +97,13 @@ const RecipeclubDetail = () => {
                 catch (error) {
                     console.error('Error fetchImage:', error);
                 }
+                // DB更新に備えて初期セット
+                setMainImage(recipe_result[0].main_image)
 
+                // 「ブランドサイトへ」リンク初期セット
                 if (recipe_result[0].brandsite_url) {
                     brandsiteUrlRef.current.innerHTML = recipe_result[0].brandsite_url
                 } else {
-                    // ブランドサイトへリンクを初期セット
                     brandsiteUrlRef.current.innerHTML = '<a href="https://www.glico.com/jp/product/">〉ブランドサイトへ</a>';
                 }
                 // PostList取得
@@ -123,6 +126,18 @@ const RecipeclubDetail = () => {
         }
     }
 
+    // ImageUploaderからファイル名を受け取るコールバック関数
+    const handleFileUpload = async (fileName) => {
+        // メイン画像の再セット
+        try {
+            const image_file = await Storage.get(fileName)
+            setMainImagePath(image_file)
+        }
+        catch (error) {
+            console.error('Error fetchImage:', error);
+        }
+        setMainImage(fileName)
+    }
     
     // 「〉ブランドサイトへ」リンク挿入
     const insertBrandsiteLink = () => {
@@ -193,6 +208,7 @@ const RecipeclubDetail = () => {
                             updated => {
                                 updated.title = updatedTitle
                                 updated.subtitle = updatedSubTitle
+                                updated.main_image = main_image
                                 updated.ingredient = updatedIngredient
                                 updated.brandsite_url = updatedBrandsiteUrl
                                 updated.show_date = awsDate
@@ -448,7 +464,8 @@ const RecipeclubDetail = () => {
                                                         }
                                                     </p>
                                                 </div>
-                                                <ImageUploader />
+                                                <ImageUploader onFileUpload={handleFileUpload} />
+                                                {main_image && <p style={{ fontSize: '9px' }}>ファイル名：{main_image}</p>}
                                             </div>
                                         </div>
                                         
@@ -557,6 +574,40 @@ const RecipeclubDetail = () => {
                                                 style={{ fontSize: '16px', letterSpacing: '0.04em', whiteSpace: 'pre' }}> </span><br />
                                         </div>
                                     </div>
+
+
+
+                                    <Table
+                                        contentEditable
+                                        caption="販売店舗一覧"
+                                        highlightOnHover={false}
+                                        size="normal"
+                                        variation="striped">
+                                        <TableHead>
+                                            <TableRow>
+                                                <TableCell as="th">店舗名</TableCell>
+                                                <TableCell as="th">住所</TableCell>
+                                                <TableCell as="th">電話番号</TableCell>
+                                            </TableRow>
+                                        </TableHead>
+                                        <TableBody>
+                                            <TableRow>
+                                                <TableCell>仙台支店</TableCell>
+                                                <TableCell>仙台市○○町</TableCell>
+                                                <TableCell>99-9999-9999</TableCell>
+                                            </TableRow>
+                                            <TableRow>
+                                                <TableCell>尼崎支店</TableCell>
+                                                <TableCell>尼崎市○○町</TableCell>
+                                                <TableCell>99-9999-9999</TableCell>
+                                            </TableRow>
+                                            <TableRow>
+                                                <TableCell>熊本支店</TableCell>
+                                                <TableCell>熊本市○○市</TableCell>
+                                                <TableCell>99-9999-9999</TableCell>
+                                            </TableRow>
+                                        </TableBody>
+                                    </Table>
                                 </div>
                             </div>
                         </div>
