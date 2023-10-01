@@ -1,0 +1,75 @@
+import { Table, TableHead, TableRow, TableCell, TableBody } from '@aws-amplify/ui-react';
+import { useRef } from 'react';
+import { useState, useEffect } from 'react';
+
+const TableStore = ({ index }) => {
+    const tableRef = useRef(null);
+
+    // 初期ロード時の処理
+    useEffect(() => {
+        const initialTableHtml = `
+            <thead>
+                <tr>
+                    <th>店舗名</th>
+                    <th>住所</th>
+                    <th>電話番号</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>仙台支店</td>
+                    <td>仙台市○○町</td>
+                    <td>99-9999-9999</td>
+                </tr>
+                <tr>
+                    <td>尼崎支店</td>
+                    <td>尼崎市○○町</td>
+                    <td>99-9999-9999</td>
+                </tr>
+                <tr>
+                    <td>熊本支店</td>
+                    <td>熊本市○○市</td>
+                    <td>99-9999-9999</td>
+                </tr>
+            </tbody>
+        `;
+        tableRef.current.innerHTML = initialTableHtml;
+    }, [])
+
+    return (
+        <div contentEditable ref={tableRef}>
+            <Table
+                caption="販売店舗一覧"
+                highlightOnHover={false}
+                size="normal"
+                variation="striped">
+                <TableHead>
+                    <TableRow>
+                        <TableCell as="th">店舗名</TableCell>
+                        <TableCell as="th">住所</TableCell>
+                        <TableCell as="th">電話番号</TableCell>
+                    </TableRow>
+                </TableHead>
+                <TableBody>
+                    <TableRow>
+                        <TableCell>仙台支店</TableCell>
+                        <TableCell>仙台市○○町</TableCell>
+                        <TableCell>99-9999-9999</TableCell>
+                    </TableRow>
+                    <TableRow>
+                        <TableCell>尼崎支店</TableCell>
+                        <TableCell>尼崎市○○町</TableCell>
+                        <TableCell>99-9999-9999</TableCell>
+                    </TableRow>
+                    <TableRow>
+                        <TableCell>熊本支店</TableCell>
+                        <TableCell>熊本市○○市</TableCell>
+                        <TableCell>99-9999-9999</TableCell>
+                    </TableRow>
+                </TableBody>
+            </Table>
+        </div>
+    )
+}
+
+export default TableStore
