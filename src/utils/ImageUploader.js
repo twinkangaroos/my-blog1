@@ -16,7 +16,7 @@ const ImageUploader = ({ onFileUpload }) => {
             try {
                 await Storage.put(file.name, file); // ファイルのアップロード
                 onFileUpload(file.name); // アップロードしたファイル名を親コンポーネントに渡す
-                alert('アップロードが成功しました');
+                console.log('アップロードが成功しました');
             } catch (error) {
                 console.error('アップロードエラー:', error);
             }

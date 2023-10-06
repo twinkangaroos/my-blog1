@@ -314,8 +314,8 @@ const RecipeclubDetail = () => {
                     <div className="l-contentsWidth">
                         <div className="l-mqWrapper">
                             <ol>
-                                <li><Link href="/"><span>with Glico</span></Link></li>
-                                <li><Link href="/"><span>レシピクラブ</span></Link></li>
+                                <li><Link href="/"><span>xxxx xxxxx</span></Link></li>
+                                <li><Link href="/"><span>XXXXXX</span></Link></li>
                             </ol>
                         </div>
                     </div>
@@ -324,7 +324,7 @@ const RecipeclubDetail = () => {
                     <div className="bgArea" style={{ backgroundImage: `url('../../../image/recipe_page_title01.png')` }}></div>
                     <div className="bgAreaSp" style={{ backgroundImage: `url('../../../image/recipe_page_title01_sp.png'` }}></div>
                     <div className="titleArea">
-                        <h1 className="m-pageTitle01"><span className="is-large">レシピクラブ</span><span className="is-small">Recipe Club</span><span
+                        <h1 className="m-pageTitle01"><span className="is-large">XXXXXX</span><span className="is-small">xxxxxx xxxx</span><span
                             className="townImage is-right" style={{ backgroundImage: `url('../../../image/recipe_town01.png'` }}></span>
                         </h1>
                     </div>
