@@ -97,10 +97,12 @@ const RecipeclubDetail = () => {
                 setMainImage(recipe_result[0].main_image)
 
                 // 「ブランドサイトへ」リンク初期セット
-                if (recipe_result[0].brandsite_url) {
-                    brandsiteUrlRef.current.innerHTML = recipe_result[0].brandsite_url
-                } else {
-                    brandsiteUrlRef.current.innerHTML = '<a href="https://www.glico.com/jp/product/">〉ブランドサイトへ</a>';
+                if (brandsiteUrlRef.current) {
+                    if (recipe_result[0].brandsite_url) {
+                        brandsiteUrlRef.current.innerHTML = recipe_result[0].brandsite_url
+                    } else {
+                        brandsiteUrlRef.current.innerHTML = '<a href="https://www.glico.com/jp/product/">〉ブランドサイトへ</a>';
+                    }
                 }
                 
             } else {

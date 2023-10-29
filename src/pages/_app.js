@@ -8,8 +8,16 @@ Amplify.configure({...awsconfig, ssr: true});
 import { I18n } from 'aws-amplify'
 import { Authenticator, translations } from '@aws-amplify/ui-react';
 
-// 独自CSS
-import '../css/stylesheet.css'; 
+// 独自CSS（Glico）
+import '../css/stylesheet.css';
+
+// 独自CSS（GC&T）
+//import '../styles/gct/hamburgers.min.css';
+import '../styles/gct/jquery.fancybox.min.css';
+import '../styles/gct/slick.css';
+import '../styles/gct/style.css';
+import '../styles/gct/style2.css';
+
 
 // https://ui.docs.amplify.aws/react/connected-components/authenticator/customization#internationalization-i18n
 I18n.putVocabularies(translations);

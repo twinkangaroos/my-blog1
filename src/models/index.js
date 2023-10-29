@@ -4,9 +4,11 @@ import { schema } from './schema';
 
 
 
-const { Recipeclub, LikeComment, User, CommentReply, Like, Comment, PostList, Post } = initSchema(schema);
+const { GctNewsList, GctNews, Recipeclub, LikeComment, User, CommentReply, Like, Comment, PostList, Post } = initSchema(schema);
 
 export {
+  GctNewsList,
+  GctNews,
   Recipeclub,
   LikeComment,
   User,

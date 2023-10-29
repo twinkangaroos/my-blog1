@@ -5,6 +5,10 @@
  **************************************************************************/
 
 export { default as studioTheme } from "./studioTheme";
+export { default as GctNewsListCreateForm } from "./GctNewsListCreateForm";
+export { default as GctNewsListUpdateForm } from "./GctNewsListUpdateForm";
+export { default as GctNewsCreateForm } from "./GctNewsCreateForm";
+export { default as GctNewsUpdateForm } from "./GctNewsUpdateForm";
 export { default as RecipeclubCreateForm } from "./RecipeclubCreateForm";
 export { default as RecipeclubUpdateForm } from "./RecipeclubUpdateForm";
 export { default as LikeCommentCreateForm } from "./LikeCommentCreateForm";

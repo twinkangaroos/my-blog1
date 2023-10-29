@@ -1,3 +1,18 @@
+type GctNewsList @model @auth(rules: [{allow: public}]) {
+  id: ID!
+  content: String
+  type: String
+  sort: Int
+  gct_news_id: String
+}
+
+type GctNews @model @auth(rules: [{allow: public}]) {
+  id: ID!
+  title: String
+  article_type: String
+  show_date: AWSDate
+}
+
 type Recipeclub @model @auth(rules: [{allow: public}]) {
   id: ID!
   title: String

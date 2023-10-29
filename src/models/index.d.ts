@@ -6,6 +6,72 @@ import { LazyLoading, LazyLoadingDisabled } from "@aws-amplify/datastore";
 
 
 
+type EagerGctNewsList = {
+  readonly [__modelMeta__]: {
+    identifier: ManagedIdentifier<GctNewsList, 'id'>;
+    readOnlyFields: 'createdAt' | 'updatedAt';
+  };
+  readonly id: string;
+  readonly content?: string | null;
+  readonly type?: string | null;
+  readonly sort?: number | null;
+  readonly gct_news_id?: string | null;
+  readonly createdAt?: string | null;
+  readonly updatedAt?: string | null;
+}
+
+type LazyGctNewsList = {
+  readonly [__modelMeta__]: {
+    identifier: ManagedIdentifier<GctNewsList, 'id'>;
+    readOnlyFields: 'createdAt' | 'updatedAt';
+  };
+  readonly id: string;
+  readonly content?: string | null;
+  readonly type?: string | null;
+  readonly sort?: number | null;
+  readonly gct_news_id?: string | null;
+  readonly createdAt?: string | null;
+  readonly updatedAt?: string | null;
+}
+
+export declare type GctNewsList = LazyLoading extends LazyLoadingDisabled ? EagerGctNewsList : LazyGctNewsList
+
+export declare const GctNewsList: (new (init: ModelInit<GctNewsList>) => GctNewsList) & {
+  copyOf(source: GctNewsList, mutator: (draft: MutableModel<GctNewsList>) => MutableModel<GctNewsList> | void): GctNewsList;
+}
+
+type EagerGctNews = {
+  readonly [__modelMeta__]: {
+    identifier: ManagedIdentifier<GctNews, 'id'>;
+    readOnlyFields: 'createdAt' | 'updatedAt';
+  };
+  readonly id: string;
+  readonly title?: string | null;
+  readonly article_type?: string | null;
+  readonly show_date?: string | null;
+  readonly createdAt?: string | null;
+  readonly updatedAt?: string | null;
+}
+
+type LazyGctNews = {
+  readonly [__modelMeta__]: {
+    identifier: ManagedIdentifier<GctNews, 'id'>;
+    readOnlyFields: 'createdAt' | 'updatedAt';
+  };
+  readonly id: string;
+  readonly title?: string | null;
+  readonly article_type?: string | null;
+  readonly show_date?: string | null;
+  readonly createdAt?: string | null;
+  readonly updatedAt?: string | null;
+}
+
+export declare type GctNews = LazyLoading extends LazyLoadingDisabled ? EagerGctNews : LazyGctNews
+
+export declare const GctNews: (new (init: ModelInit<GctNews>) => GctNews) & {
+  copyOf(source: GctNews, mutator: (draft: MutableModel<GctNews>) => MutableModel<GctNews> | void): GctNews;
+}
+
 type EagerRecipeclub = {
   readonly [__modelMeta__]: {
     identifier: ManagedIdentifier<Recipeclub, 'id'>;
